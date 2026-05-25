@@ -1,0 +1,22 @@
+
+> sentinel-backend@1.0.0 start
+> ts-node -r tsconfig-paths/register -r dotenv/config src/index.ts
+
+/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:859
+    return new TSError(diagnosticText, diagnosticCodes, diagnostics);
+           ^
+TSError: ⨯ Unable to compile TypeScript:
+src/infrastructure/typeorm/entities/course/course.entity.ts(28,37): error TS2339: Property 'course' does not exist on type 'Review'.
+
+    at createTSError (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:859:12)
+    at reportTSError (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:863:19)
+    at getOutput (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:1077:36)
+    at Object.compile (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:1433:41)
+    at Module.m._compile (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:1617:30)
+    at node:internal/modules/cjs/loader:1708:10
+    at Object.require.extensions.<computed> [as .ts] (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:1621:12)
+    at Module.load (node:internal/modules/cjs/loader:1318:32)
+    at Function._load (node:internal/modules/cjs/loader:1128:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14) {
+  diagnosticCodes: [ 2339 ]
+}

@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+        "baseUrl": "./",
+        "module": "CommonJS",
+        "target": "ES2020",
+        "declaration": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "resolveJsonModule": true,
+        "paths": {
+            "@infrastructure/*": ["src/infrastructure/*"],
+            "@domain/*": ["src/domain/*"],
+            "@ports/*": ["src/ports/*"],
+            "@common/*": ["src/common/*"]
+          }
+    },
+    "include": [
+        "src",
+        "src/infrastructure/typeorm/data-source.ts",
+        "src/common",
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}

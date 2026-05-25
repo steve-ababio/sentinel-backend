@@ -1,0 +1,21 @@
+
+> sentinel-backend@1.0.0 start
+> ts-node -r tsconfig-paths/register -r dotenv/config src/index.ts
+
+/Users/steveansah/Desktop/sentinel-backend/node_modules/tsyringe/dist/cjs/dependency-container.js:303
+        })();
+          ^
+Error: Cannot inject the dependency "registerPort" at position #0 of "AuthController" constructor. Reason:
+    Cannot inject the dependency "sendOtpPort" at position #1 of "RegisterUseCase" constructor. Reason:
+        Cannot inject the dependency "sendEmailNotificationPort" at position #2 of "SendOtpUseCase" constructor. Reason:
+            Attempted to resolve unregistered dependency token: "SendEmailNotificationPort"
+    at /Users/steveansah/Desktop/sentinel-backend/node_modules/tsyringe/dist/cjs/dependency-container.js:330:23
+    at Array.map (<anonymous>)
+    at /Users/steveansah/Desktop/sentinel-backend/node_modules/tsyringe/dist/cjs/dependency-container.js:301:38
+    at InternalDependencyContainer.construct (/Users/steveansah/Desktop/sentinel-backend/node_modules/tsyringe/dist/cjs/dependency-container.js:303:11)
+    at InternalDependencyContainer.resolve (/Users/steveansah/Desktop/sentinel-backend/node_modules/tsyringe/dist/cjs/dependency-container.js:117:33)
+    at Object.<anonymous> (/Users/steveansah/Desktop/sentinel-backend/src/infrastructure/web/routes/auth.routes.ts:7:34)
+    at Module._compile (node:internal/modules/cjs/loader:1565:14)
+    at Module.m._compile (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:1618:23)
+    at node:internal/modules/cjs/loader:1708:10
+    at Object.require.extensions.<computed> [as .ts] (/Users/steveansah/Desktop/sentinel-backend/node_modules/ts-node/src/index.ts:1621:12)
