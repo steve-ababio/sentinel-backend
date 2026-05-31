@@ -14,7 +14,8 @@ async function initializeApplication(): Promise<Server> {
     throw error
   }
   // Start server
-  return app.listen(APP_PORT)
+  const port = APP_PORT ? parseInt(APP_PORT, 10) : 4000;
+  return app.listen(port, '0.0.0.0')
 }
 
 initializeApplication()
