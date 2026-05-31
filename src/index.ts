@@ -15,10 +15,15 @@ async function initializeApplication(): Promise<Server> {
   }
   // Start server
   const port = APP_PORT ? parseInt(APP_PORT, 10) : 4000;
-  return app.listen(port, '0.0.0.0')
+  
+  return new Promise<Server>((resolve) => {
+    const server = app.listen(port, '0.0.0.0', () => {
+      resolve(server);
+    });
+  });
 }
 
-initializeApplication()
+initializeApplication() 
   .then((server) => {
     console.info('Server Started Successfully', {
       server: server.address(),
