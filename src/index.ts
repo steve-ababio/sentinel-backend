@@ -2,7 +2,7 @@ import { Server } from "http";
 import { createPostgresConnection } from "@infrastructure/typeorm/data-source";
 import { app } from "./app";
 
-const APP_PORT = process.env.APP_PORT
+const APP_PORT = process.env.PORT
 
 async function initializeApplication(): Promise<Server> {
   try {
