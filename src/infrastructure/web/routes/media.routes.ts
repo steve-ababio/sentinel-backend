@@ -10,5 +10,6 @@ const upload = multer({ limits: { fileSize: 100 * 1024 * 1024 } }); // 50 MB lim
 
 mediaRouter.get("/stream/:videoId", (ctx) => mediaController.streamVideo(ctx));
 mediaRouter.post("/upload", upload.single("file"), (ctx) => mediaController.uploadMedia(ctx));
+mediaRouter.get("/transcript/:lessonId/stream", (ctx) => mediaController.streamTranscript(ctx));
 
 export { mediaRouter };

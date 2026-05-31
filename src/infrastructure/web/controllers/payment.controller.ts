@@ -7,6 +7,7 @@ import { SaveUserCardPort } from "@ports/in/payment/save-user-card.port";
 import { ChargeCardPort } from "@ports/in/payment/charge-card.port";
 import { ChargeMobileMoneyPort } from "@ports/in/payment/charge-mobile-money.port";
 import { GetSavedCardsPort } from "@ports/in/payment/get-saved-cards.port";
+import { FindAllTransactionsByUserPort } from "@ports/in/transaction/find-all-transactions-by-user.port";
 import { verifyPaystackSignature } from "../util/paystack-signature";
 import { STATUS_CODES } from "@common/web/status-codes";
 
@@ -21,7 +22,22 @@ export class PaymentController {
         @inject("ChargeCardPort") private chargeCardPort: ChargeCardPort,
         @inject("ChargeMobileMoneyPort") private chargeMobileMoneyPort: ChargeMobileMoneyPort,
         @inject("GetSavedCardsPort") private getSavedCardsPort: GetSavedCardsPort,
+        @inject("FindAllTransactionsByUserPort") private findAllTransactionsByUserPort: FindAllTransactionsByUserPort,
     ){}
+
+    async getPaymentHistory(ctx: any) {
+        const userId = ctx.state.jwtPayload.id;
+
+        try {
+            const history = await this.findAllTransactionsByUserPort.findAllTransactionsByUser(userId);
+            ctx.status = STATUS_CODES.OK;
+            ctx.body = { message: 'Payment history retrieved successfully', data: history };
+        } catch (error: any) {
+            logger.error('Error in getPaymentHistory controller:', error);
+            ctx.status = STATUS_CODES.INTERNAL_SERVER_ERROR;
+            ctx.body = { message: error.message || MESSAGES.GENERIC_ERROR_HANDLER };
+        }
+    }
 
     async getSavedCards(ctx: any) {
         const userId = ctx.state.jwtPayload.id;

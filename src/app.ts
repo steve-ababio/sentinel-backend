@@ -49,7 +49,21 @@ app.use(async (ctx, next) => {
         logger.info('Request Body:', { body: ctx.request.body, path: ctx.path });
       }
       await next();
-    } catch (error) {
+    } catch (error: any) {
+      const isClientAbort = (err: any) => {
+        const expectedCodes = ['ECONNRESET', 'EPIPE', 'ERR_STREAM_PREMATURE_CLOSE'];
+        const expectedMessages = ['Premature close', 'stream ended early'];
+        return (
+          (err.code && expectedCodes.includes(err.code)) ||
+          (err.message && expectedMessages.some(msg => err.message.includes(msg)))
+        );
+      };
+
+      if (isClientAbort(error)) {
+        logger.info(`Client connection aborted: ${error.message} (${ctx.method} ${ctx.url})`);
+        return;
+      }
+
       let routeError: RouteError
       // If error is not a route error, convert to unknown route error
       if (error instanceof RouteError) {
@@ -65,19 +79,31 @@ app.use(async (ctx, next) => {
           message: routeError.message,
         },
       }
-      Sentry.captureException(error);
       ctx.app.emit('error', error, ctx)
     }
   });
   
   // Log errors through custom logger
   app.on('error', (error, ctx) => {
+    const isClientAbort = (err: any) => {
+      const expectedCodes = ['ECONNRESET', 'EPIPE', 'ERR_STREAM_PREMATURE_CLOSE'];
+      const expectedMessages = ['Premature close', 'stream ended early'];
+      return (
+        (err.code && expectedCodes.includes(err.code)) ||
+        (err.message && expectedMessages.some(msg => err.message.includes(msg)))
+      );
+    };
+
+    if (isClientAbort(error)) {
+      return;
+    }
+
     logger.error('Unhandled Exception', { 
       message: error.message,
       stack: error.stack,
       name: error.name,
       ...(error instanceof RouteError ? { status: error.status, routeMessage: error.message } : {}),
-      error, url: ctx.url 
+      error, url: ctx?.url 
     });
   });
   

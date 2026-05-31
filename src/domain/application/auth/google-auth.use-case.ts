@@ -12,13 +12,17 @@ import { GoogleAuthPort } from "@ports/in/auth/google-auth.port";
 import { LoginPort } from "@ports/in/auth/login.port";
 import { RegisterPort } from "@ports/in/auth/register.port";
 import { inject, injectable } from "tsyringe";
+import { UserInfoPersistencePort } from "@ports/out/persistence/user-info.persistence";
+import { UserInfoEntity } from "@domain/models/entities/user-info.entity";
+
 @injectable()
 export class GoogleAuthUseCase implements GoogleAuthPort {
     constructor(
         @inject("GoogleAuthStrategy") private googleAuthStrategy: GoogleAuthStrategy,
         @inject("LoginPort")private loginPort: LoginPort,
         @inject("RegisterPort") private registerPort: RegisterPort,
-        @inject("CreateAccountSessionActivityPort") private createAccountSessionActivityPort: CreateAccountSessionActivityPort
+        @inject("CreateAccountSessionActivityPort") private createAccountSessionActivityPort: CreateAccountSessionActivityPort,
+        @inject("UserInfoPersistencePort") private userInfoPersistencePort: UserInfoPersistencePort
     ) {}
 
     async authenticate(idToken: string, userAgent: any): Promise<{ message: string, accessToken: string, refreshToken: string }> {
@@ -38,6 +42,23 @@ export class GoogleAuthUseCase implements GoogleAuthPort {
                         socialChannelId,
                         socialChannel: SocialChannel.GOOGLE,
                     });
+                    
+                    // Create UserInfo from Google displayName
+                    let firstName = "";
+                    let lastName = "";
+                    if (displayName) {
+                        const parts = displayName.trim().split(" ");
+                        firstName = parts[0] || "";
+                        lastName = parts.slice(1).join(" ") || "";
+                    }
+                    try {
+                        await this.userInfoPersistencePort.create(
+                            new UserInfoEntity(user.id as string, firstName, lastName, "")
+                        );
+                    } catch (infoError) {
+                        logger.error("Failed to create UserInfo for Google signup:", infoError);
+                    }
+                    
                     loginResponse = { user };
                 } else {
                     logger.error(error)

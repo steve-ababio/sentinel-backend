@@ -3,6 +3,7 @@ export class ProgressEntity {
         public completed:boolean,
         public lastPosition:number,
         public userId:string,
+        public lessonId?:string,
     ) {}
 
 }

@@ -32,7 +32,8 @@ export class ProgressRepository implements ProgressPersistencePort {
         return new ProgressEntity(
             progressModel.completed,
             progressModel.lastPosition,
-            progressModel.user?.id
+            progressModel.user?.id,
+            progressModel.lesson?.id
         );
     }
 
@@ -66,8 +67,18 @@ export class ProgressRepository implements ProgressPersistencePort {
     }
 
     async save(progressEntity: ProgressEntity, lessonId: string): Promise<void> {
-        const progressModel = this.toPersistence(progressEntity, lessonId);
-        await manager.save(Progress, progressModel);
+        const existing = await manager.findOne(Progress, {
+            where: { user: { id: progressEntity.userId }, lesson: { id: lessonId } }
+        });
+        
+        if (existing) {
+            existing.completed = progressEntity.completed;
+            existing.lastPosition = progressEntity.lastPosition;
+            await manager.save(Progress, existing);
+        } else {
+            const progressModel = this.toPersistence(progressEntity, lessonId);
+            await manager.save(Progress, progressModel);
+        }
     }
 
     async findByLesson(userId: string, lessonId: string): Promise<ProgressEntity | null> {

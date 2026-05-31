@@ -37,6 +37,6 @@ export class Lesson extends BaseEntity {
     {nullable: true}
 )
   @JoinTable()
-  public resource!: File[] | null; 
+  public resource!: Resource[] | null; 
   
 }

@@ -35,9 +35,17 @@ export class ContactRepository implements ContactPersistencePort {
 
 
     async save(contactEntity: ContactEntity): Promise<void> {
-        const user = await manager.findOne(User, { where: { id: contactEntity.userId as string } });
-        const contactModel = this.toPersistence(contactEntity, user as User);
-        await manager.save(Contact, contactModel);
+        const existing = await manager.findOne(Contact, {
+            where: { identifier: contactEntity.identifier, identifierType: contactEntity.identifierType }
+        });
+        if (existing) {
+            existing.status = contactEntity.status;
+            await manager.save(Contact, existing);
+        } else {
+            const user = await manager.findOne(User, { where: { id: contactEntity.userId as string } });
+            const contactModel = this.toPersistence(contactEntity, user as User);
+            await manager.save(Contact, contactModel);
+        }
     }
     async update(contact: ContactEntity): Promise<BaseResponse> {
         try {

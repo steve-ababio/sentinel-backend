@@ -15,6 +15,7 @@ import { userRouter } from "./user.routes";
 import { mediaRouter } from "./media.routes";
 import { paymentRouter } from "./payment.route";
 import { paymentChargeRouter } from "./payment-charge.route";
+import { testRouter } from "./test.routes";
 
 const jwtMiddlewareInstance = container.resolve(JwtMiddleware);
 
@@ -33,6 +34,7 @@ router.use("/review", reviewRouter.routes());
 router.use("/enrollment",enrollmentRouter.routes());
 router.use("/user",userRouter.routes());
 router.use("/media",mediaRouter.routes());
+router.use("/test", testRouter.routes());
 
 router.use(router.allowedMethods())
 export { router }; 

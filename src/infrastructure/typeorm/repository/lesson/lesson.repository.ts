@@ -37,13 +37,21 @@ export class LessonRepository implements LessonPersistencePort {
             lessonModel.duration,
             lessonModel.id,
             lessonModel.module?.id,
+            lessonModel.resource ? lessonModel.resource.map(r => ({
+                id: r.id,
+                filename: r.filename,
+                type: r.type,
+                url: r.url,
+                mimeType: r.mimeType,
+                readonly: r.readonly
+            })) : []
         );
     }
 
     async findByModule(moduleId: string): Promise<LessonEntity[]> {
         const lessons = await manager.find(Lesson, {
             where: { module: { id: moduleId } },
-            relations: ["module"],
+            relations: ["module", "resource"],
             order: { order: "ASC" }
         });
         return lessons.map(l => this.toDomain(l));
@@ -52,7 +60,7 @@ export class LessonRepository implements LessonPersistencePort {
     async findById(lessonId: string): Promise<LessonEntity | null> {
         const lesson = await manager.findOne(Lesson, {
             where: { id: lessonId },
-            relations: ["module"]
+            relations: ["module", "resource"]
         });
         if (!lesson) return null;
         return this.toDomain(lesson);

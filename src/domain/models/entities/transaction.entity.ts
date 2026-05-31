@@ -13,6 +13,10 @@ export class TransactionEntity {
     public transactionType: TransactionType,
     public id?: string,
     public userId?: string,
-    public createdAt?: Date
+    public createdAt?: Date,
+    public courseId?: string,
+    public cardBrand?: string,
+    public cardLast4?: string,
+    public courseTitle?: string
   ) {}
 }

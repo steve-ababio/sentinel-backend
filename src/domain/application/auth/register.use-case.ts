@@ -5,6 +5,8 @@ import { IdentifierType,SocialChannel } from "@common/auth/enum";
 import { UserEntity } from "@domain/models/entities/user.entity";
 import { RouteError } from "@infrastructure/web/util/route-error";
 import { SendOtpPort } from "@ports/in/auth/send-otp.port";
+import { ContactPersistencePort } from "@ports/out/persistence/contact.persistence.port";
+import { ContactStatus } from "@common/user/enum";
 import { STATUS_CODES } from "@common/web/status-codes";
 import bcrypt from 'bcrypt';
 import { AUTH_MESSAGES } from "@common/auth/constants";
@@ -16,6 +18,8 @@ export class RegisterUseCase implements RegisterPort {
         private userPersistence: UserPersistencePort,
         @inject('SendOtpPort')
         private sendOtpPort: SendOtpPort,
+        @inject('ContactPersistencePort')
+        private contactPersistence: ContactPersistencePort,
     ) { }
 
     async register({ email, socialChannelId,socialChannel, password }: RegisterPortOptions): Promise<UserEntity> {
@@ -33,7 +37,18 @@ export class RegisterUseCase implements RegisterPort {
             socialChannel,
             socialChannelId
         });
-        await this.sendOtpPort.sendOtp(email,IdentifierType.EMAIL,newUser.id as string);
+        
+        if (socialChannel !== SocialChannel.NONE) {
+            await this.contactPersistence.save({
+                userId: newUser.id as string,
+                identifier: email,
+                identifierType: IdentifierType.EMAIL as any,
+                status: ContactStatus.VERIFIED
+            });
+        } else {
+            await this.sendOtpPort.sendOtp(email, IdentifierType.EMAIL, newUser.id as string);
+        }
+        
         return newUser;
     }
 

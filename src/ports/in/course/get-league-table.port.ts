@@ -7,6 +7,7 @@ export interface LeagueTableEntry {
     points: number;
     date: string;
     status: string;
+    profilePicture?: string | null;
 }
 
 export interface GetLeagueTablePort {

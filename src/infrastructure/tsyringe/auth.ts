@@ -20,7 +20,7 @@ import { OtpRepository } from "@infrastructure/typeorm/repository/otp/otp.reposi
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { SendEmailNotificationPort } from "@ports/out/notification/send-email.notification";
-import { SendEmailMailer } from "@infrastructure/smtp/send-email.service";
+import { SendEmailMailer } from "@infrastructure/smtp/emailers/send-email.emailer";
 import { RequestPasswordResetUseCase } from "@domain/application/auth/request-password-reset.use-case";
 import { RequestPasswordResetPort } from "@ports/in/auth/request-password-reset.port";
 import { ResetPasswordPort } from "@ports/in/auth/reset-password.port";

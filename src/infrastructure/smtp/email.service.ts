@@ -25,10 +25,10 @@ export class EmailService implements IEmailService {
 
     async sendEmail(email: string, subject: string, html: string,imageattachments:Mail.Attachment[],): Promise<void> {
         const messageStatus = await this.transporter.sendMail({
-            from: 'MyHealthCOP <notifications@myhealthcop.com>', // sender address
-            to: email, // list of receivers
-            subject, // Subject line
-            html, // plain text body,
+            from: 'SPK <spk@gmail.com>',
+            to: email, 
+            subject,
+            html,
             attachments:imageattachments
         });
 

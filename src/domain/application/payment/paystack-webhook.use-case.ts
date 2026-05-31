@@ -33,6 +33,9 @@ export class PaystackWebhookUseCase implements PaystackWebhookPort {
             else if (channel === 'bank') paymentMode = PaymentMode.BANK;
 
             const userId = metadata?.userId;
+            const courseId = metadata?.courseId;
+            const cardBrand = event.data.authorization?.brand;
+            const cardLast4 = event.data.authorization?.last4;
 
             try {
                 const transaction = new TransactionEntity(
@@ -44,7 +47,11 @@ export class PaystackWebhookUseCase implements PaystackWebhookPort {
                     TransactionStatus.SUCCESS,
                     TransactionType.PAYMENT,
                     undefined,
-                    userId
+                    userId,
+                    undefined,
+                    courseId,
+                    cardBrand,
+                    cardLast4
                 );
                 await this.createTransactionPort.createTransaction(transaction);
                 logger.info(`Recorded successful transaction for reference: ${reference}`);

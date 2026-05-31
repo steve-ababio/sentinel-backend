@@ -1,9 +1,9 @@
 import { AccessTokenPayload, RefreshTokenPayload, ResetTokenPayload } from '@common/global/types';
 import jwt from 'jsonwebtoken';
 
-const ACCESS_TOKEN_VALIDITY = '15m';
+const ACCESS_TOKEN_VALIDITY = '1m';
 const REFRESH_TOKEN_VALIDITY = '7d';
-const RESET_TOKEN_VALIDITY = '15m';
+const RESET_TOKEN_VALIDITY = '30m';
 
 export interface TokenPair {
     accessToken: string;

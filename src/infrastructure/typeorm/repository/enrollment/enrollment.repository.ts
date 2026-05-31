@@ -83,6 +83,7 @@ export class EnrollmentRepository implements EnrollmentPersistencePort {
                 ui.first_name as "firstName",
                 ui.last_name as "lastName",
                 ui.company as company,
+                ui.profile_picture as "profilePicture",
                 e.status as status,
                 e.created_at as "date",
                 c.title as course,
@@ -110,7 +111,8 @@ export class EnrollmentRepository implements EnrollmentPersistencePort {
             course: row.course,
             points: Math.floor(Number(row.points) * 10), // Deriving score from progress seconds
             date: row.date,
-            status: row.status
+            status: row.status,
+            profilePicture: row.profilePicture
         }));
     }
 }

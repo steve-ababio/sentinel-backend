@@ -1,7 +1,7 @@
 import { createLogger } from "../util/logger";
 import { inject, injectable } from "tsyringe";
 import { RegisterPort } from "@ports/in/auth/register.port";
-import { generateTokenPair, verifyRefreshToken } from "../util/jwt";
+import { generateTokenPair, verifyRefreshToken, verifyAccessToken } from "../util/jwt";
 import { LoginPort } from "@ports/in/auth/login.port";
 import { CreateAccountSessionActivityPort } from "@ports/in/auth/create-account-session-activity.port";
 import { AccountSessionStatus, SocialChannel } from "@common/auth/enum";
@@ -148,10 +148,23 @@ export class AuthController {
 
     async authenticateViaGoogle(ctx: any) {
         const { idToken } = ctx.request.body;
-        const platform = ctx.headers['x-platform'];
+        const userAgent = ctx.userAgent || { platform: "Unknown", os: "Unknown" };
 
         try {
-            const { message, accessToken, refreshToken } = await this.googleAuthPort.authenticate(idToken, platform);
+            const { message, accessToken, refreshToken } = await this.googleAuthPort.authenticate(idToken, userAgent);
+            
+            ctx.cookies.set("accessToken", accessToken, {
+                httpOnly: true,
+                sameSite: "lax",
+                maxAge: 1000 * 60 * 15 // 15 minutes
+            });
+
+            ctx.cookies.set("refreshToken", refreshToken, {
+                httpOnly: true,
+                sameSite: "lax",
+                maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+            });
+
             ctx.status = STATUS_CODES.OK;
             ctx.body = { message, accessToken, refreshToken };
         } catch (error) {
@@ -233,11 +246,54 @@ export class AuthController {
     }
 
     async logout(ctx: any) {
-        const { sessionId } = ctx.request.body;
+        let sessionId = ctx.request.body?.sessionId;
+        
+        // Extract sessionId from access token if not in body
+        if (!sessionId) {
+            const accessToken = ctx.cookies.get("accessToken");
+            if (accessToken) {
+                try {
+                    const decoded = verifyAccessToken(accessToken);
+                    sessionId = decoded.sessionId;
+                } catch (e) {
+                    // Ignore and try refresh token next
+                }
+            }
+        }
+        
+        // Extract sessionId from refresh token if still not found
+        if (!sessionId) {
+            const refreshToken = ctx.cookies.get("refreshToken");
+            if (refreshToken) {
+                try {
+                    const decoded = verifyRefreshToken(refreshToken);
+                    sessionId = decoded.sessionId;
+                } catch (e) {
+                    // Ignore
+                }
+            }
+        }
         
         try {
-            // Update session status to expired
-            await this.logoutPort.logout(sessionId, AccountSessionStatus.EXPIRED);
+            if (sessionId) {
+                // Update session status to expired in the database
+                await this.logoutPort.logout(sessionId, AccountSessionStatus.EXPIRED);
+            }
+            
+            // Clear HTTP-only cookies from client
+            ctx.cookies.set("accessToken", "", {
+                httpOnly: true,
+                sameSite: "lax",
+                expires: new Date(0),
+                maxAge: 0
+            });
+            
+            ctx.cookies.set("refreshToken", "", {
+                httpOnly: true,
+                sameSite: "lax",
+                expires: new Date(0),
+                maxAge: 0
+            });
             
             ctx.status = STATUS_CODES.OK;
             ctx.body = { message: 'Logged out successfully' };

@@ -11,6 +11,6 @@ export class LessonEntity {
       public duration: number,
       public id?: string,
       public moduleId?: string,
-      public resources?:Partial<ResourceEntity>,
+      public resources?: ResourceEntity[],
     ) {}
   }

@@ -1,5 +1,6 @@
 import { Entity, ManyToOne, JoinColumn } from "typeorm";
 import { User } from "../user/user.entity";
+import { Course } from "../course/course.entity";
 import { Column } from "typeorm";
 import { TransactionStatus, TransactionType } from "@common/global/types";
 import { CurrencyCodes, PaymentMode, UniqueCurrencies } from "@common/user/enum";
@@ -46,7 +47,25 @@ export class Transaction extends BaseEntity{
     })
     public transactionType!: TransactionType;
 
+    @Column({
+        name: 'card_brand',
+        type: 'varchar',
+        nullable: true,
+    })
+    public cardBrand!: string | null;
+
+    @Column({
+        name: 'card_last4',
+        type: 'varchar',
+        nullable: true,
+    })
+    public cardLast4!: string | null;
+
     @ManyToOne(() => User, { nullable: true })
     @JoinColumn({ name: 'user_id' })
     user!: User;
+
+    @ManyToOne(() => Course, { nullable: true })
+    @JoinColumn({ name: 'course_id' })
+    course!: Course | null;
 }

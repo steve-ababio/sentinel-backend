@@ -7,7 +7,8 @@ export class UserInfoEntity {
         public company?: string,
         public profilePicture?:string,
         public id?: string,
-         public email?:string,
+        public email?:string,
+        public isEmailVerified?: boolean,
     ) {}
 
 }

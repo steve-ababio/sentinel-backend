@@ -9,6 +9,7 @@ export class ModuleEntity {
         public moduleDetails:string | null,
         public courseId?:string,
         public id?:string,
+        public test?: any,
     ) {}
 
 }
