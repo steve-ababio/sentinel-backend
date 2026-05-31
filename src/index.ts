@@ -13,14 +13,19 @@ async function initializeApplication(): Promise<Server> {
     console.error('Error connecting to database', { error })
     throw error
   }
+
+    // Start server
+//   const port = APP_PORT ? parseInt(APP_PORT, 10) : 4000;
+  
+//   return new Promise<Server>((resolve) => {
+//     const server = app.listen(port, '0.0.0.0', () => {
+//       resolve(server);
+//     });
+//   });
+// }
   // Start server
   const port = APP_PORT ? parseInt(APP_PORT, 10) : 4000;
-  
-  return new Promise<Server>((resolve) => {
-    const server = app.listen(port, '0.0.0.0', () => {
-      resolve(server);
-    });
-  });
+  return app.listen(port)
 }
 
 initializeApplication() 
