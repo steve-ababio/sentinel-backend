@@ -44,10 +44,6 @@ export class SendOtpUseCase implements SendOtpPort {
     if (identifierType === IdentifierType.EMAIL) {
         await this.sendEmailNotificationPort.sendOtpEmail(identifier, code);
       }
-      
-    // else {
-    //   await this.sendSmsPort.sendSms({ recipients: [identifier], message: `Your OTP ${code}`, sender: SENDER_ID })
-    // }
 
     logger.info(`Sending OTP ${code} to ${identifier}`);
   }

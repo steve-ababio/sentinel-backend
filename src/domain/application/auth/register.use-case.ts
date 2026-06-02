@@ -38,16 +38,17 @@ export class RegisterUseCase implements RegisterPort {
             socialChannelId
         });
         
-        if (socialChannel !== SocialChannel.NONE) {
-            await this.contactPersistence.save({
+        const isSocial = socialChannel && socialChannel !== SocialChannel.NONE;
+        
+        await Promise.all([
+            this.contactPersistence.save({
                 userId: newUser.id as string,
                 identifier: email,
                 identifierType: IdentifierType.EMAIL as any,
-                status: ContactStatus.VERIFIED
-            });
-        } else {
-            await this.sendOtpPort.sendOtp(email, IdentifierType.EMAIL, newUser.id as string);
-        }
+                status: isSocial ? ContactStatus.VERIFIED : ContactStatus.PENDING
+            }),
+            ...(isSocial ? [] : [this.sendOtpPort.sendOtp(email, IdentifierType.EMAIL, newUser.id as string)])
+        ]);
         
         return newUser;
     }

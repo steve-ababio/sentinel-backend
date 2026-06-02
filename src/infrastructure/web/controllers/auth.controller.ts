@@ -76,7 +76,8 @@ export class AuthController {
                 message: MESSAGES.ACCOUNT_CREATED, 
                 accessToken: tokens.accessToken,
                 refreshToken: tokens.refreshToken,
-                sessionId
+                sessionId,
+                userId: user.id as string
             };
         } catch (error) {
             handleRouteError(error,ctx,logger);

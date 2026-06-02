@@ -13,7 +13,7 @@ export class EmailService implements IEmailService {
 
     constructor() {
         this.transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
+            host: process.env.EMAIL_HOST,
             port: Number(process.env.MAIL_PORT),
             secure: true, // true for 465, false for other ports
             auth: {
@@ -25,7 +25,7 @@ export class EmailService implements IEmailService {
 
     async sendEmail(email: string, subject: string, html: string,imageattachments:Mail.Attachment[],): Promise<void> {
         const messageStatus = await this.transporter.sendMail({
-            from: 'SPK <spk@gmail.com>',
+            from: 'noreply <sentinel240391@gmail.com>',
             to: email, 
             subject,
             html,
