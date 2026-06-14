@@ -18,7 +18,10 @@ export enum SubscriptionStatus {
     SUCCESS = 'success',
     FAILED = 'failed',
   }
-  
+  export enum UserRole{
+    ADMIN="ADMIN",
+    USER="USER"
+  }
   export enum EnrollmentStatus {
     ACTIVE = 'active',
     COMPLETED = 'completed',
@@ -51,6 +54,15 @@ export interface BaseQueryParams {
   page?: number
   resultsPerPage?: number
 }
+
+export type BaseListResponse<T> = {
+    success: boolean
+    totalRecords: number
+    details: T[]
+    message?: string
+    error?: any
+}
+
 
 export enum FileType {
   IMAGE = "IMAGE",

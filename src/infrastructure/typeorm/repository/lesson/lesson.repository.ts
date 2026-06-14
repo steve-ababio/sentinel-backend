@@ -24,6 +24,19 @@ export class LessonRepository implements LessonPersistencePort {
             moduleModel.id = lessonEntity.moduleId;
             lessonModel.module = moduleModel;
         }
+
+        if (lessonEntity.resources) {
+            lessonModel.resource = lessonEntity.resources.map(r => {
+                const res = new Resource();
+                if (r.id) res.id = r.id;
+                res.filename = r.filename;
+                res.type = r.type as any;
+                res.url = r.url;
+                res.mimeType = r.mimeType as any;
+                res.readonly = !!r.readonly;
+                return res;
+            });
+        }
         return lessonModel;
     }
 
@@ -67,14 +80,6 @@ export class LessonRepository implements LessonPersistencePort {
     }
 
     async findNextLesson(courseId: string, currentLessonOrder: number): Promise<LessonEntity | null> {
-        // const nextLesson = await manager.findOne(Lesson, {
-        //     where: { 
-        //         module: { course: { id: courseId } }
-        //     },
-        //     relations: ["module", "module.course"],
-        //     order: { order: "ASC" }
-        // });
-
         // We find the first lesson strictly greater in order, ignoring module boundary for simple approach
         const query = manager.getRepository(Lesson).createQueryBuilder("lesson")
             .leftJoinAndSelect("lesson.module", "module")
@@ -106,7 +111,13 @@ export class LessonRepository implements LessonPersistencePort {
     }
 
     async create(lessonEntity: LessonEntity): Promise<LessonEntity> {
-        const savedLesson = await manager.save(Lesson, this.toPersistence(lessonEntity));
+        const persistenceModel = this.toPersistence(lessonEntity);
+        if (persistenceModel.resource) {
+            for (let i = 0; i < persistenceModel.resource.length; i++) {
+                persistenceModel.resource[i] = await manager.save(Resource, persistenceModel.resource[i]);
+            }
+        }
+        const savedLesson = await manager.save(Lesson, persistenceModel);
         return this.toDomain(savedLesson);
     }
 

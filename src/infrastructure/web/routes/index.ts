@@ -16,6 +16,9 @@ import { mediaRouter } from "./media.routes";
 import { paymentRouter } from "./payment.route";
 import { paymentChargeRouter } from "./payment-charge.route";
 import { testRouter } from "./test.routes";
+import { instructorRouter } from "./instructor.route";
+import { adminRouter } from "./admin.routes";
+import { contactRouter } from "./contact.routes";
 
 const jwtMiddlewareInstance = container.resolve(JwtMiddleware);
 
@@ -23,6 +26,7 @@ const router = new Router();
 
 router.use("/auth", authRouter.routes());
 router.use("/payment", paymentRouter.routes());
+router.use("/contact", contactRouter.routes());
 router.use(jwtMiddlewareInstance.jwtMiddleware.bind(jwtMiddlewareInstance));
 router.use("/payment/charge", paymentChargeRouter.routes());
 router.use("/course",courseRouter.routes());
@@ -34,6 +38,8 @@ router.use("/review", reviewRouter.routes());
 router.use("/enrollment",enrollmentRouter.routes());
 router.use("/user",userRouter.routes());
 router.use("/media",mediaRouter.routes());
+router.use("/instructor", instructorRouter.routes());
+router.use("/admin", adminRouter.routes());
 router.use("/test", testRouter.routes());
 
 router.use(router.allowedMethods())

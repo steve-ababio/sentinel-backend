@@ -1,6 +1,7 @@
 import { Entity, Column, Unique, Index } from 'typeorm';
 import { BaseEntity } from '../base/base.entity';
 import { AccountAuthStatus, SocialChannel } from '@common/auth/enum';
+import { UserRole } from '@common/global/types';
 
 
 @Entity({ name: 'user' })
@@ -32,6 +33,9 @@ export class User extends BaseEntity {
 
   @Column({ name: 'password', type: 'varchar', nullable: true })
   public password!: string | null; 
+
+  @Column({ name: 'role', type: 'enum', enum:UserRole, default: UserRole.USER })
+  public role!: UserRole;
 
   @Column({
     name: 'password_reset_date',

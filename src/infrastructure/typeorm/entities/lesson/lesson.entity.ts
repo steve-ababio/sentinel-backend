@@ -38,5 +38,4 @@ export class Lesson extends BaseEntity {
 )
   @JoinTable()
   public resource!: Resource[] | null; 
-  
 }

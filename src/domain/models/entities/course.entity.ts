@@ -1,4 +1,4 @@
-import { CourseLevel } from "@common/global/types";
+import { CourseLevel, PricingModel } from "@common/global/types";
 import { ReviewEntity } from "./review.entity";
 import { ProgressEntity } from "./progress.entity";
 import { InstructorEntity } from "./instructor.entity";
@@ -17,6 +17,7 @@ export class CourseEntity {
         public approvalRate: number,
         public languages:string[],
         public price: number,
+        public pricingModel:PricingModel,
         public enrolledCount: number,
   
         public specialization: string | null,
@@ -26,6 +27,7 @@ export class CourseEntity {
         public reviews:ReviewEntity[],
         public id?:string,
         public instructor?: InstructorEntity | null,
+        public instructorId?: string,
     ) {}
 
 }

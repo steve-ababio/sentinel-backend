@@ -87,7 +87,6 @@ export class AuthController {
     async login(ctx: any) {
         const dto = ctx.request.body;
         const { email, password } = dto
-        logger.info("device: ",ctx.userAgent)
         try {
             const {user} = await this.loginPort.login({email, socialChannelId:null, socialChannel:SocialChannel.NONE, password});
             const sessionId = await this.createAccountSessionActivityPort.createAccountSessionActivity({

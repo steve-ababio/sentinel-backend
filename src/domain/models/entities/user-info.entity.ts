@@ -9,6 +9,7 @@ export class UserInfoEntity {
         public id?: string,
         public email?:string,
         public isEmailVerified?: boolean,
+        public role?: string,
     ) {}
 
 }

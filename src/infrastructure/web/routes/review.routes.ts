@@ -7,5 +7,6 @@ const reviewController = container.resolve(ReviewController);
 
 reviewRouter.get("/course/:courseId", (ctx) => reviewController.findReviewsByCourse(ctx));
 reviewRouter.get("/course/:courseId/stats", (ctx) => reviewController.getCourseReviewStats(ctx));
+reviewRouter.post("/course/:courseId", (ctx) => reviewController.createReview(ctx));
 
 export { reviewRouter };

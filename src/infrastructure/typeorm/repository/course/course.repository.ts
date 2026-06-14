@@ -1,4 +1,4 @@
-import { BaseResponse } from "@common/global/types";
+import { BaseListResponse, BaseResponse } from "@common/global/types";
 import { CourseEntity } from "@domain/models/entities/course.entity";
 import { CourseParams, CoursePersistencePort } from "@ports/out/persistence/course.persistence";
 import { manager } from "@infrastructure/typeorm/data-source";
@@ -7,12 +7,14 @@ import { injectable } from "tsyringe";
 import { EntityType } from "@common/global/types";
 import { Review } from "@infrastructure/typeorm/entities/review/review.entity";
 import { InstructorEntity } from "@domain/models/entities/instructor.entity";
+import { Instructor } from "@infrastructure/typeorm/entities/instructor/instructor.entity";
 
 @injectable()
 export class CourseRepository implements CoursePersistencePort {
 
     private toPersistence(course: CourseEntity): Course {
         const courseModel = new Course();
+        if(course.id) courseModel.id = course.id;
         if(course.title !== undefined || course.title !== null) courseModel.title = course.title;
         if(course.description !== undefined || course.description !== null)courseModel.description = course.description;
         if(course.thumbnail !== undefined || course.thumbnail !== null)courseModel.thumbnail = course.thumbnail;
@@ -26,8 +28,15 @@ export class CourseRepository implements CoursePersistencePort {
         if(course.enrolledCount !== undefined || course.enrolledCount !== null)courseModel.enrolledCount = course.enrolledCount;
         if(course.languages)courseModel.languages = course.languages;
         if(course.specialization)courseModel.specialization = course.specialization;
+        if(course.pricingModel)courseModel.pricingModel = course.pricingModel;
         if(course.expectedExperience)courseModel.expectedExperience = course.expectedExperience;
         if(course.skillsGained)courseModel.skillsGained = course.skillsGained;
+        
+        if (course.instructorId) {
+            const inst = new Instructor();
+            inst.id = course.instructorId;
+            courseModel.instructor = inst;
+        }
         return courseModel;
     }
 
@@ -49,7 +58,7 @@ export class CourseRepository implements CoursePersistencePort {
                 (course.instructor as any).reviewCount
             );
         }
-
+        const enrollmentCount = course.enrollments.length;
         return new CourseEntity(
             course.title,
             course.description,
@@ -61,13 +70,15 @@ export class CourseRepository implements CoursePersistencePort {
             course.approvalRate,
             course.languages,
             course.price,
-            course.enrolledCount,
+            course.pricingModel,
+            enrollmentCount,
             course.specialization,
             [],
             course.difficulty,
             [],
             course.id,
-            instructorEntity
+            instructorEntity,
+            course.instructor?.id
         );
     }
 
@@ -88,7 +99,7 @@ export class CourseRepository implements CoursePersistencePort {
     async findById(courseId: string): Promise<CourseEntity | null> {
         const courseEntity = await manager.findOne(Course, { 
             where: { id: courseId },
-            relations: ["instructor"]
+            relations: ["instructor","enrollments"]
         });
         
         if (!courseEntity) return null;
@@ -109,9 +120,9 @@ export class CourseRepository implements CoursePersistencePort {
         return this.toDomain(courseEntity);
     }
 
-    async findAll(params?: CourseParams): Promise<CourseEntity[]> {
+    async findAll(params?: CourseParams): Promise<BaseListResponse<CourseEntity>> {
         const query = manager.getRepository(Course).createQueryBuilder("course");
-        
+        query.leftJoinAndSelect("course.enrollments","enrollments")
         if (params?.search) {
             query.andWhere("course.title ILIKE :search", { search: `%${params.search}%` });
         }
@@ -125,9 +136,9 @@ export class CourseRepository implements CoursePersistencePort {
             const limit = params.resultsPerPage || 10;
             query.skip((params.page - 1) * limit);
         }
-
+        const totalRecords = await query.getCount();
         const courses = await query.getMany();
-        return courses.map(c => this.toDomain(c));
+        return{ success: true, totalRecords: totalRecords, details: courses.map(this.toDomain)};
     }
 
     async delete(courseId: string): Promise<BaseResponse> {

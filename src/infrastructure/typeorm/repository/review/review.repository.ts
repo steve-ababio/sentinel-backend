@@ -13,7 +13,7 @@ export class ReviewRepository implements ReviewPersistencePort {
     private toDomain(review: Review): ReviewEntity {
         return new ReviewEntity(
             review.id,
-            review.reviewer?.user.id,
+            review.reviewer?.id,
             review.rating,
             review.entityType,
             review.entityId,
@@ -24,8 +24,10 @@ export class ReviewRepository implements ReviewPersistencePort {
     async create(userId: string, courseId: string, reviewEntity: ReviewEntity): Promise<void> {
         const review = new Review();
         
-        const userInfo = new UserInfo();
-        userInfo.user.id = userId;
+        const userInfo = await manager.findOne(UserInfo, { where: { user: { id: userId } } });
+        if (!userInfo) {
+            throw new Error(`UserInfo not found for reviewer with user ID ${userId}`);
+        }
         review.reviewer = userInfo;
         
         review.entityType = EntityType.COURSE;
@@ -42,6 +44,7 @@ export class ReviewRepository implements ReviewPersistencePort {
             relations: ["reviewer"],
             order: { createdAt: "DESC" }
         });
+        console.log("reviews: ",reviews);
         
         return reviews.map(r => {
             const entity = this.toDomain(r);

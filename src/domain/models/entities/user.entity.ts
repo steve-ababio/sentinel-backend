@@ -1,4 +1,5 @@
 import { SocialChannel } from "@common/auth/enum";
+import { UserRole } from "@common/global/types";
 
 export class UserEntity {
     constructor(
@@ -8,6 +9,7 @@ export class UserEntity {
         public socialChannel: SocialChannel,
         public socialChannelId: string | null,
         public promptPasswordChange?: boolean | null,
+        public role?: UserRole,
     ) {}
 
 }

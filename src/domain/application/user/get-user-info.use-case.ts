@@ -36,7 +36,8 @@ export class GetUserInfoUseCase implements GetUserInfoPort {
             userInfo?.profilePicture,
             userInfo?.id,
             user?.email,
-            isEmailVerified
+            isEmailVerified,
+            user?.role
         )
     }
 }

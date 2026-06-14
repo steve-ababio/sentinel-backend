@@ -14,6 +14,8 @@ import { ChargeMobileMoneyUseCase } from "@domain/application/payment/charge-mob
 
 import { GetSavedCardsPort } from "@ports/in/payment/get-saved-cards.port";
 import { GetSavedCardsUseCase } from "@domain/application/payment/get-saved-cards.use-case";
+import { VerifyPaymentPort } from "@ports/in/payment/verify-payment.port";
+import { VerifyPaymentUseCase } from "@domain/application/payment/verify-payment.use-case";
 
 container.register<PaystackPaymentPort>("PaystackPaymentPort", {
     useClass: PaystackPaymentService
@@ -41,4 +43,8 @@ container.register<ChargeMobileMoneyPort>("ChargeMobileMoneyPort", {
 
 container.register<GetSavedCardsPort>("GetSavedCardsPort", {
     useClass: GetSavedCardsUseCase
+});
+
+container.register<VerifyPaymentPort>("VerifyPaymentPort", {
+    useClass: VerifyPaymentUseCase
 });

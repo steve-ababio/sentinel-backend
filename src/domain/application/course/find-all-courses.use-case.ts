@@ -1,3 +1,4 @@
+import { BaseListResponse } from "@common/global/types";
 import { CourseEntity } from "@domain/models/entities/course.entity";
 import { FindAllCoursesPort } from "@ports/in/course/find-all-courses.port";
 import { CourseParams, CoursePersistencePort } from "@ports/out/persistence/course.persistence";
@@ -10,7 +11,7 @@ export class FindAllCoursesUseCase implements FindAllCoursesPort {
     private readonly coursePersistencePort: CoursePersistencePort
   ) {}
 
-  async findAllCourses(params?: CourseParams): Promise<CourseEntity[]> {
+  async findAllCourses(params?: CourseParams): Promise<BaseListResponse<CourseEntity>> {
     return this.coursePersistencePort.findAll(params);
   }
 }

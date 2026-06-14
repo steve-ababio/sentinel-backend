@@ -68,6 +68,7 @@ export class PaystackWebhookUseCase implements PaystackWebhookPort {
                         metadata.courseId
                     );
                     await this.createEnrollmentPort.createEnrollment(enrollment);
+                    
                     logger.info(`Successfully enrolled user ${metadata.userId} in course ${metadata.courseId}`);
                 } catch (error) {
                     logger.error(`Failed to create enrollment for user ${metadata.userId} and course ${metadata.courseId}`, error);

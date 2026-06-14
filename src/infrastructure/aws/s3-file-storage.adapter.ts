@@ -3,6 +3,8 @@ import { FileStoragePort, StreamResponse } from "@ports/out/storage/file-storage
 import { Readable } from "stream";
 import { injectable } from "tsyringe";
 import crypto from "crypto";
+import fs from "fs";
+import path from "path";
 
 @injectable()
 export class S3FileStorageAdapter implements FileStoragePort {
@@ -41,20 +43,37 @@ export class S3FileStorageAdapter implements FileStoragePort {
 
     async uploadFile(file: any, folder?: string): Promise<{ url: string; key: string }> {
         const uniqueId = crypto.randomUUID();
-        const key = folder ? `${folder}/${uniqueId}-${file.originalname}` : `${uniqueId}-${file.originalname}`;
+        const filename = `${uniqueId}-${file.originalname}`;
+        const key = folder ? `${folder}/${filename}` : filename;
         
-        const command = new PutObjectCommand({
-            Bucket: this.bucketName,
-            Key: key,
-            Body: file.buffer,
-            ContentType: file.mimetype,
-        });
+        try {
+            const command = new PutObjectCommand({
+                Bucket: this.bucketName,
+                Key: key,
+                Body: file.buffer,
+                ContentType: file.mimetype,
+            });
 
-        await this.s3Client.send(command);
+            await this.s3Client.send(command);
 
-        const region = await this.s3Client.config.region();
-        const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${key}`;
+            const region = await this.s3Client.config.region();
+            const url = `https://${this.bucketName}.s3.${region}.amazonaws.com/${key}`;
 
-        return { url, key };
+            return { url, key };
+        } catch (error) {
+            console.error("AWS S3 upload failed, falling back to local storage:", error);
+            
+            // Save locally
+            const uploadsDir = path.join(process.cwd(), "uploads");
+            if (!fs.existsSync(uploadsDir)) {
+                fs.mkdirSync(uploadsDir, { recursive: true });
+            }
+            
+            const filepath = path.join(uploadsDir, filename);
+            fs.writeFileSync(filepath, file.buffer);
+            
+            const url = `/api-backend/admin/uploads/${filename}`;
+            return { url, key: filename };
+        }
     }
 }

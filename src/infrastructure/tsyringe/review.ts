@@ -9,6 +9,9 @@ import { FindReviewsByCourseUseCase } from "@domain/application/review/find-revi
 import { GetCourseReviewStatsPort } from "@ports/in/review/get-course-review-stats.port";
 import { GetCourseReviewStatsUseCase } from "@domain/application/review/get-course-review-stats.use-case";
 
+import { CreateReviewPort } from "@ports/in/review/create-review.port";
+import { CreateReviewUseCase } from "@domain/application/review/create-review.use-case";
+
 container.register<ReviewPersistencePort>("ReviewPersistencePort", {
     useClass: ReviewRepository
 });
@@ -19,4 +22,8 @@ container.register<FindReviewsByCoursePort>("FindReviewsByCoursePort", {
 
 container.register<GetCourseReviewStatsPort>("GetCourseReviewStatsPort", {
     useClass: GetCourseReviewStatsUseCase
+});
+
+container.register<CreateReviewPort>("CreateReviewPort", {
+    useClass: CreateReviewUseCase
 });

@@ -1,8 +1,10 @@
-import { BaseResponse } from "@common/global/types";
+import { BaseResponse, EntityType } from "@common/global/types";
 import { InstructorEntity } from "@domain/models/entities/instructor.entity";
 import { InstructorParams, InstructorPersistencePort } from "@ports/out/persistence/instructor.persistence";
 import { manager } from "@infrastructure/typeorm/data-source";
 import { Instructor } from "@infrastructure/typeorm/entities/instructor/instructor.entity";
+import { Course } from "@infrastructure/typeorm/entities/course/course.entity";
+import { Review } from "@infrastructure/typeorm/entities/review/review.entity";
 import { injectable } from "tsyringe";
 
 @injectable()
@@ -56,7 +58,35 @@ export class InstructorRepository implements InstructorPersistencePort {
             where: { id }
         });
         if (!model) return null;
-        return this.toDomain(model);
+
+        const coursesCount = await manager.getRepository(Course).count({
+            where: { instructor: { id: model.id } }
+        });
+
+        const stats = await manager.createQueryBuilder(Review, "review")
+            .select("AVG(review.rating)", "average")
+            .addSelect("COUNT(review.id)", "count")
+            .where("review.entityId = :instructorId", { instructorId: model.id })
+            .andWhere("review.entityType = :entityType", { entityType: EntityType.INSTRUCTOR })
+            .getRawOne();
+
+        const avgRating = stats?.average ? parseFloat(Number(stats.average).toFixed(1)) : 0;
+        const revCount = stats?.count ? parseInt(stats.count, 10) : 0;
+
+        return new InstructorEntity(
+            model.email,
+            model.firstName,
+            model.lastName,
+            model.profilePicture,
+            model.role,
+            model.specialization,
+            model.phoneNumber,
+            model.bio,
+            model.id,
+            avgRating,
+            revCount,
+            coursesCount
+        );
     }
 
     async findAll(params?: InstructorParams): Promise<InstructorEntity[]> {
@@ -78,7 +108,40 @@ export class InstructorRepository implements InstructorPersistencePort {
         }
 
         const models = await query.getMany();
-        return models.map(m => this.toDomain(m));
+        const entities: InstructorEntity[] = [];
+
+        for (const m of models) {
+            const coursesCount = await manager.getRepository(Course).count({
+                where: { instructor: { id: m.id } }
+            });
+
+            const stats = await manager.createQueryBuilder(Review, "review")
+                .select("AVG(review.rating)", "average")
+                .addSelect("COUNT(review.id)", "count")
+                .where("review.entityId = :instructorId", { instructorId: m.id })
+                .andWhere("review.entityType = :entityType", { entityType: EntityType.INSTRUCTOR })
+                .getRawOne();
+
+            const avgRating = stats?.average ? parseFloat(Number(stats.average).toFixed(1)) : 0;
+            const revCount = stats?.count ? parseInt(stats.count, 10) : 0;
+
+            entities.push(new InstructorEntity(
+                m.email,
+                m.firstName,
+                m.lastName,
+                m.profilePicture,
+                m.role,
+                m.specialization,
+                m.phoneNumber,
+                m.bio,
+                m.id,
+                avgRating,
+                revCount,
+                coursesCount
+            ));
+        }
+
+        return entities;
     }
 
     async delete(id: string): Promise<BaseResponse> {

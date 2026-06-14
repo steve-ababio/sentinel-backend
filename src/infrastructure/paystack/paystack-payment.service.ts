@@ -43,7 +43,6 @@ export class PaystackPaymentService implements PaystackPaymentPort {
 
   async verifyPayment(reference: string): Promise<any> {
     const url = `${this.paystackBaseUrl}/transaction/verify/${reference}`;
-
     try {
       const response = await axios.get(url, {
         headers: {
@@ -51,14 +50,14 @@ export class PaystackPaymentService implements PaystackPaymentPort {
         }
       });
 
-      if (response.data.status) {
+      if (response.data.status && response.data.data.status === "success") {
         return {
-          success: true,
-          data: response.data.data
+          verified: true,
+          message: response.data.message
         };
       } else {
         return {
-          success: false,
+          verified: false,
           message: response.data.message
         };
       }

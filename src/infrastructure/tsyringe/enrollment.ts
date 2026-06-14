@@ -12,6 +12,9 @@ import { FindEnrollmentByIdsUseCase } from "@domain/application/enrollment/find-
 import { FindAllEnrollmentsByUserPort } from "@ports/in/enrollment/find-all-enrollments-by-user.port";
 import { FindAllEnrollmentsByUserUseCase } from "@domain/application/enrollment/find-all-enrollments-by-user.use-case";
 
+import { CompleteEnrollmentPort } from "@ports/in/enrollment/complete-enrollment.port";
+import { CompleteEnrollmentUseCase } from "@domain/application/enrollment/complete-enrollment.use-case";
+
 container.register<EnrollmentPersistencePort>("EnrollmentPersistencePort", {
     useClass: EnrollmentRepository
 });
@@ -27,3 +30,8 @@ container.register<FindEnrollmentByIdsPort>("FindEnrollmentByIdsPort", {
 container.register<FindAllEnrollmentsByUserPort>("FindAllEnrollmentsByUserPort", {
     useClass: FindAllEnrollmentsByUserUseCase
 });
+
+container.register<CompleteEnrollmentPort>("CompleteEnrollmentPort", {
+    useClass: CompleteEnrollmentUseCase
+});
+

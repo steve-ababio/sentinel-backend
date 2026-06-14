@@ -10,6 +10,7 @@ import { GetSavedCardsPort } from "@ports/in/payment/get-saved-cards.port";
 import { FindAllTransactionsByUserPort } from "@ports/in/transaction/find-all-transactions-by-user.port";
 import { verifyPaystackSignature } from "../util/paystack-signature";
 import { STATUS_CODES } from "@common/web/status-codes";
+import { VerifyPaymentPort } from "@ports/in/payment/verify-payment.port";
 
 const logger = createLogger('CONTROLLER', 'PAYMENT');
 
@@ -23,6 +24,7 @@ export class PaymentController {
         @inject("ChargeMobileMoneyPort") private chargeMobileMoneyPort: ChargeMobileMoneyPort,
         @inject("GetSavedCardsPort") private getSavedCardsPort: GetSavedCardsPort,
         @inject("FindAllTransactionsByUserPort") private findAllTransactionsByUserPort: FindAllTransactionsByUserPort,
+        @inject("VerifyPaymentPort") private verifyPaymentPort: VerifyPaymentPort,
     ){}
 
     async getPaymentHistory(ctx: any) {
@@ -158,6 +160,19 @@ export class PaymentController {
           console.error('Error processing Paystack webhook:', error);
           ctx.status = 500;
           ctx.body = { message: MESSAGES.GENERIC_ERROR_HANDLER};
+        }
+    }
+    async verifyPayment(ctx:any){
+         const { reference } = ctx.params;
+        try{
+            const payment = await this.verifyPaymentPort.verifyPayment(reference);
+            console.log("verification response: ",payment)
+            ctx.status = STATUS_CODES.OK;
+            ctx.body = payment;
+        }catch(error:any){
+            logger.error('Error in verifyPayment contro§ller:', error);
+            ctx.status = STATUS_CODES.INTERNAL_SERVER_ERROR;
+            ctx.body = { message: error.message || MESSAGES.GENERIC_ERROR_HANDLER };
         }
     }
 

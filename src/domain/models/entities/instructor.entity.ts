@@ -10,6 +10,7 @@ export class InstructorEntity {
         public bio?: string,
         public id?: string,
         public averageRating?: number,
-        public reviewCount?: number
+        public reviewCount?: number,
+        public coursesCount?: number
     ) {}
 }

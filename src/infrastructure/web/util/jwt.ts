@@ -1,7 +1,7 @@
 import { AccessTokenPayload, RefreshTokenPayload, ResetTokenPayload } from '@common/global/types';
 import jwt from 'jsonwebtoken';
 
-const ACCESS_TOKEN_VALIDITY = '1m';
+const ACCESS_TOKEN_VALIDITY = '1h';
 const REFRESH_TOKEN_VALIDITY = '7d';
 const RESET_TOKEN_VALIDITY = '30m';
 
@@ -10,16 +10,6 @@ export interface TokenPair {
     refreshToken: string;
 }
 
-// export const generateJwtToken = (
-// userId: string,
-//     sessionId: string,
-//     options?: { companyId?: string; userInfoId?: string }
-// ): string => {
-//     const payload: Record<string, any> = { id: userId, sessionId, type: 'access' };
-//     if (options?.companyId) payload.companyId = options.companyId;
-//     if (options?.userInfoId) payload.userInfoId = options.userInfoId;
-//     return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: ACCESS_TOKEN_VALIDITY });
-// };
 export const generateJwtToken = (
     userId: string,
     sessionId: string,

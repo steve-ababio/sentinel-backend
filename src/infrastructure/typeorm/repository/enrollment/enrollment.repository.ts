@@ -1,4 +1,4 @@
-import { BaseResponse } from "@common/global/types";
+import { BaseResponse, EnrollmentStatus } from "@common/global/types";
 import { EnrollmentEntity } from "@domain/models/entities/enrollment.entity";
 import { EnrollmentPersistencePort } from "@ports/out/persistence/enrollment.persistence";
 import { manager } from "@infrastructure/typeorm/data-source";
@@ -76,7 +76,7 @@ export class EnrollmentRepository implements EnrollmentPersistencePort {
 
     async getLeagueTable(courseId: string): Promise<any[]> {
         // Query enrollments for the course, joining UserInfo to get name and company.
-        // For points, we do a subquery to sum 'lastPosition' from Progress for the user's lessons in this course.
+        // For points, we sum the maximum test submission scores for all tests in this course.
         const results = await manager.query(`
             SELECT 
                 u.identifier as handle,
@@ -88,11 +88,16 @@ export class EnrollmentRepository implements EnrollmentPersistencePort {
                 e.created_at as "date",
                 c.title as course,
                 COALESCE((
-                    SELECT SUM(p.last_position)
-                    FROM progress p
-                    JOIN lessons l ON p.lesson_id = l.id
-                    JOIN module m ON l.module_id = m.id
-                    WHERE p.user_id = u.id AND m.course_id = $1
+                    SELECT SUM(max_score)
+                    FROM (
+                        SELECT MAX(ts.score) as max_score, ts.user_id
+                        FROM test_submissions ts
+                        JOIN tests t ON ts.test_id = t.id
+                        JOIN module m ON t.module_id = m.id
+                        WHERE m.course_id = $1
+                        GROUP BY ts.test_id, ts.user_id
+                    ) test_max_scores
+                    WHERE test_max_scores.user_id = u.id
                 ), 0) as points
             FROM enrollment e
             JOIN "user" u ON e.user_id = u.id
@@ -109,10 +114,25 @@ export class EnrollmentRepository implements EnrollmentPersistencePort {
             handle: row.handle,
             company: row.company || 'N/A',
             course: row.course,
-            points: Math.floor(Number(row.points) * 10), // Deriving score from progress seconds
+            points: Math.round(Number(row.points)), // Accumulated test points (sum of best test scores)
             date: row.date,
             status: row.status,
             profilePicture: row.profilePicture
         }));
+    }
+
+    async updateStatus(userId: string, courseId: string, status: EnrollmentStatus): Promise<BaseResponse> {
+        try {
+            const result = await manager.update(Enrollment, 
+                { user: { id: userId }, course: { id: courseId } }, 
+                { status }
+            );
+            if (result.affected && result.affected > 0) {
+                return { success: true, message: "Enrollment status updated successfully" };
+            }
+            return { success: false, message: "Enrollment not found" };
+        } catch (error: any) {
+            return { success: false, message: error.message };
+        }
     }
 }

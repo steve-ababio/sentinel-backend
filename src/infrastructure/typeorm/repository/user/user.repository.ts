@@ -4,7 +4,7 @@ import { User } from "@infrastructure/typeorm/entities/user/user.entity";
 import { UserPersistencePort } from "@ports/out/persistence/user.persistence";
 import { AccountAuthStatus } from "@common/auth/enum";
 import { injectable } from "tsyringe";
-import { BaseResponse } from "@common/global/types";
+import { BaseResponse, UserRole } from "@common/global/types";
 
 @injectable()
 export class UserRepository implements UserPersistencePort {
@@ -13,8 +13,9 @@ export class UserRepository implements UserPersistencePort {
         const userModel = new User();
         userModel.identifier = user.email;  // Maps to `identifier`
         userModel.password = user.password;
-        userModel.socialChannel = user.socialChannel
-        userModel.socialChannelId = user.socialChannelId
+        userModel.socialChannel = user.socialChannel;
+        userModel.socialChannelId = user.socialChannelId;
+        userModel.role = user.role as UserRole;
         return userModel;
     }
 
@@ -24,7 +25,9 @@ export class UserRepository implements UserPersistencePort {
             user.identifier,  // Maps from `identifier`
             user.password,
             user.socialChannel,
-            user.socialChannelId
+            user.socialChannelId,
+            null,
+            user.role
         );
     }
 
