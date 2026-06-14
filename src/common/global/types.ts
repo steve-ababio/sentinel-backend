@@ -26,7 +26,14 @@ export enum SubscriptionStatus {
     ACTIVE = 'active',
     COMPLETED = 'completed',
   }
-
+export interface ContactBody {
+  name: string;
+  email: string;
+  company?: string;
+  phoneCode?: string;
+  phoneNumber?: string;
+  message: string;
+}
   export enum TransactionType {
     PAYMENT = "PAYMENT",
     REFUND = "REFUND",

@@ -4,6 +4,7 @@ import { EmailService } from "../../smtp/email.service";
 import Joi from "joi";
 import { validateRequest } from "../util/koa-joi-validate";
 import { STATUS_CODES } from "@common/web/status-codes";
+import { ContactBody } from "@common/global/types";
 
 const emailService = container.resolve(EmailService);
 const contactRouter = new Router();
@@ -21,7 +22,7 @@ contactRouter.post("/",
     }),
     async (ctx) => {
         try {
-            const { name, email, company, phoneCode, phoneNumber, message } = ctx.request.body;
+            const { name, email, company, phoneCode, phoneNumber, message } = ctx.request.body as ContactBody;
             
             const targetEmail = process.env.CONTACT_EMAIL || process.env.EMAIL_USER || "sentinel240391@gmail.com";
             const subject = `New Contact Form Submission from ${name}`;
