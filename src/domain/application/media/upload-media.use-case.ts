@@ -27,4 +27,19 @@ export class UploadMediaUseCase implements UploadMediaPort {
             throw new RouteError(STATUS_CODES.INTERNAL_SERVER_ERROR, "Failed to upload file");
         }
     }
+
+    async generateUploadUrl(fileName: string, contentType: string, folder?: string) {
+        if (!fileName || !contentType) {
+            throw new RouteError(STATUS_CODES.BAD_REQUEST, "fileName and contentType are required");
+        }
+        try {
+            logger.info(`Generating upload URL for ${fileName} (${contentType}) in folder ${folder || 'root'}`);
+            const result = await this.fileStoragePort.generatePresignedUploadUrl(fileName, contentType, folder);
+            logger.info(`Upload URL generated successfully for key: ${result.key}`);
+            return result;
+        } catch (error) {
+            logger.error(`Error generating upload URL: ${error}`);
+            throw new RouteError(STATUS_CODES.INTERNAL_SERVER_ERROR, "Failed to generate upload URL");
+        }
+    }
 }

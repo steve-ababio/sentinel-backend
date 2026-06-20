@@ -8,6 +8,9 @@ import { PassThrough } from "stream";
 import { manager } from "@infrastructure/typeorm/data-source";
 import { Lesson } from "@infrastructure/typeorm/entities/lesson/lesson.entity";
 import { TranscriptionService } from "@domain/application/media/transcriptionService";
+import fs from "fs";
+import path from "path";
+import { pipeline } from "stream/promises";
 
 const logger = createLogger('CONTROLLER', 'MEDIA');
 
@@ -47,6 +50,46 @@ export class MediaController {
             ctx.body = {
                 message: "File uploaded successfully",
                 data: response
+            };
+        } catch (error) {
+            handleRouteError(error, ctx, logger);
+        }
+    }
+
+    async generateUploadUrl(ctx: any) {
+        try {
+            const { fileName, contentType, folder } = ctx.request.body || {};
+            const response = await this.uploadMediaPort.generateUploadUrl(fileName, contentType, folder);
+            
+            ctx.status = STATUS_CODES.OK;
+            ctx.body = {
+                message: "Upload URL generated successfully",
+                data: response
+            };
+        } catch (error) {
+            handleRouteError(error, ctx, logger);
+        }
+    }
+
+    async uploadLocal(ctx: any) {
+        try {
+            const { filename } = ctx.params;
+            const uploadsDir = path.join(process.cwd(), "uploads");
+            if (!fs.existsSync(uploadsDir)) {
+                fs.mkdirSync(uploadsDir, { recursive: true });
+            }
+            const filepath = path.join(uploadsDir, filename);
+            const writeStream = fs.createWriteStream(filepath);
+            
+            await pipeline(ctx.req, writeStream);
+            
+            ctx.status = STATUS_CODES.OK;
+            ctx.body = {
+                message: "File uploaded locally successfully",
+                data: {
+                    url: `/api-backend/admin/uploads/${filename}`,
+                    key: filename
+                }
             };
         } catch (error) {
             handleRouteError(error, ctx, logger);

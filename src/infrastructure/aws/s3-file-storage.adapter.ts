@@ -1,4 +1,5 @@
 import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { FileStoragePort, StreamResponse } from "@ports/out/storage/file-storage.port";
 import { Readable } from "stream";
 import { injectable } from "tsyringe";
@@ -76,4 +77,60 @@ export class S3FileStorageAdapter implements FileStoragePort {
             return { url, key: filename };
         }
     }
+
+    async generatePresignedUploadUrl(fileName: string, contentType: string, folder?: string): Promise<{
+        uploadUrl: string;
+        publicUrl: string;
+        key: string;
+        method: string;
+        headers: Record<string, string>;
+    }> {
+        const uniqueId = crypto.randomUUID();
+        const filename = `${uniqueId}-${fileName}`;
+        const key = folder ? `${folder}/${filename}` : filename;
+
+        const isS3Configured = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY && process.env.AWS_S3_BUCKET_NAME;
+
+        if (isS3Configured) {
+            try {
+                const command = new PutObjectCommand({
+                    Bucket: this.bucketName,
+                    Key: key,
+                    ContentType: contentType,
+                });
+
+                const uploadUrl = await getSignedUrl(this.s3Client, command, { expiresIn: 3600 });
+                const region = await this.s3Client.config.region();
+                const publicUrl = `https://${this.bucketName}.s3.${region}.amazonaws.com/${key}`;
+
+                return {
+                    uploadUrl,
+                    publicUrl,
+                    key,
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": contentType,
+                    },
+                };
+            } catch (error) {
+                console.error("AWS S3 presigned URL generation failed, falling back to local:", error);
+            }
+        }
+
+        // Local fallback:
+        // Returns a local path for client to PUT the file. The client must route this via the local API.
+        const uploadUrl = `/media/upload-local/${filename}`;
+        const publicUrl = `/api-backend/admin/uploads/${filename}`;
+
+        return {
+            uploadUrl,
+            publicUrl,
+            key: filename,
+            method: "PUT",
+            headers: {
+                "Content-Type": contentType,
+            },
+        };
+    }
 }
+
