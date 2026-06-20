@@ -12,19 +12,10 @@ async function initializeApplication(): Promise<Server> {
   } catch (error) {
     console.error('Error connecting to database', { error })
     throw error
-  }
+  } 
 
-    // Start server
-//   const port = APP_PORT ? parseInt(APP_PORT, 10) : 4000;
-  
-//   return new Promise<Server>((resolve) => {
-//     const server = app.listen(port, '0.0.0.0', () => {
-//       resolve(server);
-//     });
-//   });
-// }
-  // Start server
-  const port = APP_PORT ? parseInt(APP_PORT, 10) : 4000;
+  const port = 4000;
+  // APP_PORT ? parseInt(APP_PORT, 10) : 4000;
   return app.listen(port)
 }
 
