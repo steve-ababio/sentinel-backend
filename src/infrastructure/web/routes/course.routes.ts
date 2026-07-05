@@ -52,8 +52,8 @@ courseRouter.patch(
     (ctx) => courseController.updateCourse(ctx)
 );
 
-courseRouter.get("/", (ctx) => courseController.findAllCourses(ctx));
-courseRouter.get("/:id", (ctx) => courseController.findCourseById(ctx));
+// courseRouter.get("/", (ctx) => courseController.findAllCourses(ctx));
+// courseRouter.get("/:id", (ctx) => courseController.findCourseById(ctx));
 courseRouter.get("/:id/league", (ctx) => courseController.getLeagueTable(ctx));
 courseRouter.delete("/:id", adminGuard, (ctx) => courseController.deleteCourse(ctx));
 

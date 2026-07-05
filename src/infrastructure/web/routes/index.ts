@@ -19,6 +19,7 @@ import { testRouter } from "./test.routes";
 import { instructorRouter } from "./instructor.route";
 import { adminRouter } from "./admin.routes";
 import { contactRouter } from "./contact.routes";
+import { coursesRouter } from "./courses.routes";
 
 const jwtMiddlewareInstance = container.resolve(JwtMiddleware);
 
@@ -27,6 +28,7 @@ const router = new Router();
 router.use("/auth", authRouter.routes());
 router.use("/payment", paymentRouter.routes());
 router.use("/contact", contactRouter.routes());
+router.use("/courses",coursesRouter.routes());
 router.use(jwtMiddlewareInstance.jwtMiddleware.bind(jwtMiddlewareInstance));
 router.use("/payment/charge", paymentChargeRouter.routes());
 router.use("/course",courseRouter.routes());
