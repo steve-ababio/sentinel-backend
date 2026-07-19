@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./dist",
+    "paths": {
+      "@infrastructure/*": ["infrastructure/*"],
+      "@domain/*": ["domain/*"],
+      "@ports/*": ["ports/*"],
+      "@common/*": ["common/*"]
+    }
+  }
+}

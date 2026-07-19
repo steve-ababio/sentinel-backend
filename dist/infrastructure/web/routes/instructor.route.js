@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.instructorRouter = void 0;
+const koa_router_1 = __importDefault(require("koa-router"));
+const tsyringe_1 = require("tsyringe");
+const instructor_controller_1 = require("../controllers/instructor.controller");
+const middleware_1 = require("../middleware/middleware");
+const instructorRouter = new koa_router_1.default();
+exports.instructorRouter = instructorRouter;
+const instructorController = tsyringe_1.container.resolve(instructor_controller_1.InstructorController);
+const adminMiddleware = tsyringe_1.container.resolve(middleware_1.AdminMiddleware);
+const adminGuard = adminMiddleware.adminGuard.bind(adminMiddleware);
+instructorRouter.post("/", adminGuard, (ctx) => instructorController.createInstructor(ctx));
+instructorRouter.patch("/:id", adminGuard, (ctx) => instructorController.updateInstructor(ctx));
+instructorRouter.get("/:id", (ctx) => instructorController.getInstructor(ctx));
+instructorRouter.delete("/:id", adminGuard, (ctx) => instructorController.deleteInstructor(ctx));
+instructorRouter.get("/", (ctx) => instructorController.list(ctx));

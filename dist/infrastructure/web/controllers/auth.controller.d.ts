@@ -1,0 +1,33 @@
+import { RegisterPort } from "@ports/in/auth/register.port";
+import { LoginPort } from "@ports/in/auth/login.port";
+import { CreateAccountSessionActivityPort } from "@ports/in/auth/create-account-session-activity.port";
+import { GoogleAuthPort } from "@ports/in/auth/google-auth.port";
+import { RequestPasswordResetPort } from "@ports/in/auth/request-password-reset.port";
+import { ResetPasswordPort } from "@ports/in/auth/reset-password.port";
+import { AccountSessionActivityPersistencePort } from "@ports/out/persistence/account-session-activity.persistence";
+import { LogoutPort } from "@ports/in/auth/logout.port";
+import { SendOtpPort } from "@ports/in/auth/send-otp.port";
+import { ValidateOtpPort } from "@ports/in/auth/validate-otp.port";
+export declare class AuthController {
+    private registerPort;
+    private loginPort;
+    private googleAuthPort;
+    private createAccountSessionActivityPort;
+    private requestPasswordResetPort;
+    private resetPasswordPort;
+    private logoutPort;
+    private sendOtpPort;
+    private validateOtpPort;
+    private accountSessionActivityPersistencePort;
+    constructor(registerPort: RegisterPort, loginPort: LoginPort, googleAuthPort: GoogleAuthPort, createAccountSessionActivityPort: CreateAccountSessionActivityPort, requestPasswordResetPort: RequestPasswordResetPort, resetPasswordPort: ResetPasswordPort, logoutPort: LogoutPort, sendOtpPort: SendOtpPort, validateOtpPort: ValidateOtpPort, accountSessionActivityPersistencePort: AccountSessionActivityPersistencePort);
+    register(ctx: any): Promise<void>;
+    login(ctx: any): Promise<void>;
+    authenticateViaSocial(ctx: any): Promise<void>;
+    authenticateViaGoogle(ctx: any): Promise<void>;
+    requestResetPassword(ctx: any): Promise<void>;
+    resetPassword(ctx: any): Promise<void>;
+    refreshToken(ctx: any): Promise<void>;
+    logout(ctx: any): Promise<void>;
+    sendOtp(ctx: any): Promise<void>;
+    validateOtp(ctx: any): Promise<void>;
+}

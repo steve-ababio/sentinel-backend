@@ -1,0 +1,81 @@
+"use strict";
+var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ModuleController = void 0;
+const logger_1 = require("../util/logger");
+const tsyringe_1 = require("tsyringe");
+const status_codes_1 = require("@common/web/status-codes");
+const utils_1 = require("@common/global/utils");
+const logger = (0, logger_1.createLogger)('CONTROLLER', 'MODULE');
+let ModuleController = class ModuleController {
+    constructor(saveModulePort, findModuleByIdPort, deleteModulePort, findModulesByCoursePort) {
+        this.saveModulePort = saveModulePort;
+        this.findModuleByIdPort = findModuleByIdPort;
+        this.deleteModulePort = deleteModulePort;
+        this.findModulesByCoursePort = findModulesByCoursePort;
+    }
+    async saveModule(ctx) {
+        try {
+            const dto = ctx.request.body;
+            const response = await this.saveModulePort.saveModule(dto);
+            ctx.status = status_codes_1.STATUS_CODES.OK;
+            ctx.body = response;
+        }
+        catch (error) {
+            (0, utils_1.handleRouteError)(error, ctx, logger);
+        }
+    }
+    async findModuleById(ctx) {
+        try {
+            const { id } = ctx.params;
+            const response = await this.findModuleByIdPort.findModuleById(id);
+            ctx.status = status_codes_1.STATUS_CODES.OK;
+            ctx.body = response;
+        }
+        catch (error) {
+            (0, utils_1.handleRouteError)(error, ctx, logger);
+        }
+    }
+    async deleteModule(ctx) {
+        try {
+            const { id } = ctx.params;
+            const response = await this.deleteModulePort.deleteModule(id);
+            ctx.status = status_codes_1.STATUS_CODES.OK;
+            ctx.body = response;
+        }
+        catch (error) {
+            (0, utils_1.handleRouteError)(error, ctx, logger);
+        }
+    }
+    async findModulesByCourse(ctx) {
+        try {
+            const { courseId } = ctx.params;
+            const response = await this.findModulesByCoursePort.findModulesByCourse(courseId);
+            ctx.status = status_codes_1.STATUS_CODES.OK;
+            ctx.body = response;
+        }
+        catch (error) {
+            (0, utils_1.handleRouteError)(error, ctx, logger);
+        }
+    }
+};
+exports.ModuleController = ModuleController;
+exports.ModuleController = ModuleController = __decorate([
+    (0, tsyringe_1.injectable)(),
+    __param(0, (0, tsyringe_1.inject)("SaveModulePort")),
+    __param(1, (0, tsyringe_1.inject)("FindModuleByIdPort")),
+    __param(2, (0, tsyringe_1.inject)("DeleteModulePort")),
+    __param(3, (0, tsyringe_1.inject)("FindModulesByCoursePort")),
+    __metadata("design:paramtypes", [Object, Object, Object, Object])
+], ModuleController);

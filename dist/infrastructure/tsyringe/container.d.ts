@@ -1,0 +1,14 @@
+import 'reflect-metadata';
+import "./auth";
+import "./contact";
+import "./course";
+import "./lesson";
+import "./module";
+import "./progress";
+import "./transaction";
+import "./enrollment";
+import "./media";
+import "./user";
+import "./instructor";
+import "./payment";
+import "./review";

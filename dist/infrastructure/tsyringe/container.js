@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+require("reflect-metadata");
+require("./auth");
+require("./contact");
+require("./course");
+require("./lesson");
+require("./module");
+require("./progress");
+require("./transaction");
+require("./enrollment");
+require("./media");
+require("./user");
+require("./instructor");
+require("./payment");
+require("./review");

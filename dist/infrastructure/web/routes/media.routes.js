@@ -1,0 +1,22 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.mediaRouter = void 0;
+const koa_router_1 = __importDefault(require("koa-router"));
+const tsyringe_1 = require("tsyringe");
+const media_controller_1 = require("../controllers/media.controller");
+const multer_1 = __importDefault(require("@koa/multer"));
+const middleware_1 = require("../middleware/middleware");
+const mediaRouter = new koa_router_1.default();
+exports.mediaRouter = mediaRouter;
+const mediaController = tsyringe_1.container.resolve(media_controller_1.MediaController);
+const adminMiddleware = tsyringe_1.container.resolve(middleware_1.AdminMiddleware);
+const adminGuard = adminMiddleware.adminGuard.bind(adminMiddleware);
+const upload = (0, multer_1.default)({ limits: { fileSize: 100 * 1024 * 1024 } });
+mediaRouter.get("/stream/:videoId", (ctx) => mediaController.streamVideo(ctx));
+mediaRouter.post("/upload", upload.single("file"), (ctx) => mediaController.uploadMedia(ctx));
+mediaRouter.post("/presigned-url", (ctx) => mediaController.generateUploadUrl(ctx));
+mediaRouter.put("/upload-local/:filename", adminGuard, (ctx) => mediaController.uploadLocal(ctx));
+mediaRouter.get("/transcript/:lessonId/stream", (ctx) => mediaController.streamTranscript(ctx));
