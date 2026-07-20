@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "start": "ts-node -r tsconfig-paths/register -r dotenv/config src/index.ts",
+    "dev": "ts-node -r tsconfig-paths/register -r dotenv/config src/index.ts",
+    "start": "node -r tsconfig-paths/register -r dotenv/config dist/index.js",
     "migration:generate": "bash ./src/infrastructure/typeorm/scripts/generate-migration.sh",
     "migration:run": "bash ./src/infrastructure/typeorm/scripts/run-migrations.sh"
   },
