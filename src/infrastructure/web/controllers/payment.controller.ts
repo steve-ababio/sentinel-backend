@@ -11,6 +11,7 @@ import { FindAllTransactionsByUserPort } from "@ports/in/transaction/find-all-tr
 import { verifyPaystackSignature } from "../util/paystack-signature";
 import { STATUS_CODES } from "@common/web/status-codes";
 import { VerifyPaymentPort } from "@ports/in/payment/verify-payment.port";
+import { DeleteSavedCardPort } from "@ports/in/payment/delete-saved-card.port";
 
 const logger = createLogger('CONTROLLER', 'PAYMENT');
 
@@ -25,7 +26,23 @@ export class PaymentController {
         @inject("GetSavedCardsPort") private getSavedCardsPort: GetSavedCardsPort,
         @inject("FindAllTransactionsByUserPort") private findAllTransactionsByUserPort: FindAllTransactionsByUserPort,
         @inject("VerifyPaymentPort") private verifyPaymentPort: VerifyPaymentPort,
+        @inject("DeleteSavedCardPort") private deleteSavedCardPort: DeleteSavedCardPort,
     ){}
+
+    async deleteSavedCard(ctx: any) {
+        const userId = ctx.state.jwtPayload.id;
+        const { id } = ctx.params;
+
+        try {
+            await this.deleteSavedCardPort.deleteSavedCard(id, userId);
+            ctx.status = STATUS_CODES.OK;
+            ctx.body = { message: 'Saved card deleted successfully' };
+        } catch (error: any) {
+            logger.error('Error in deleteSavedCard controller:', error);
+            ctx.status = STATUS_CODES.INTERNAL_SERVER_ERROR;
+            ctx.body = { message: error.message || MESSAGES.GENERIC_ERROR_HANDLER };
+        }
+    }
 
     async getPaymentHistory(ctx: any) {
         const userId = ctx.state.jwtPayload.id;

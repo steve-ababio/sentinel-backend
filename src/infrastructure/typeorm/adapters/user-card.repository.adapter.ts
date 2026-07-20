@@ -54,4 +54,13 @@ export class UserCardRepositoryAdapter implements UserCardPersistencePort {
     });
     return entities.map(e => this.toDomain(e));
   }
+
+  async delete(id: string, userId: string): Promise<void> {
+    const card = await this.repository.findOne({
+      where: { id, user: { id: userId } }
+    });
+    if (card) {
+      await this.repository.remove(card);
+    }
+  }
 }

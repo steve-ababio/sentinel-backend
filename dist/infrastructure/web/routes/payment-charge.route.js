@@ -10,6 +10,7 @@ const koa_router_1 = __importDefault(require("koa-router"));
 const paymentController = tsyringe_1.container.resolve(payment_controller_1.PaymentController);
 exports.paymentChargeRouter = new koa_router_1.default();
 exports.paymentChargeRouter.get("/saved-cards", (ctx) => paymentController.getSavedCards(ctx));
+exports.paymentChargeRouter.delete("/saved-cards/:id", (ctx) => paymentController.deleteSavedCard(ctx));
 exports.paymentChargeRouter.post("/save-card", (ctx) => paymentController.saveCard(ctx));
 exports.paymentChargeRouter.post("/charge", (ctx) => paymentController.chargeCard(ctx));
 exports.paymentChargeRouter.post("/charge-momo", (ctx) => paymentController.chargeMobileMoney(ctx));

@@ -9,6 +9,7 @@ const tsyringe_1 = require("tsyringe");
 const charge_mobile_money_use_case_1 = require("@domain/application/payment/charge-mobile-money.use-case");
 const get_saved_cards_use_case_1 = require("@domain/application/payment/get-saved-cards.use-case");
 const verify_payment_use_case_1 = require("@domain/application/payment/verify-payment.use-case");
+const delete_saved_card_use_case_1 = require("@domain/application/payment/delete-saved-card.use-case");
 tsyringe_1.container.register("PaystackPaymentPort", {
     useClass: paystack_payment_service_1.PaystackPaymentService
 });
@@ -32,4 +33,7 @@ tsyringe_1.container.register("GetSavedCardsPort", {
 });
 tsyringe_1.container.register("VerifyPaymentPort", {
     useClass: verify_payment_use_case_1.VerifyPaymentUseCase
+});
+tsyringe_1.container.register("DeleteSavedCardPort", {
+    useClass: delete_saved_card_use_case_1.DeleteSavedCardUseCase
 });

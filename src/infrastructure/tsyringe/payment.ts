@@ -16,6 +16,8 @@ import { GetSavedCardsPort } from "@ports/in/payment/get-saved-cards.port";
 import { GetSavedCardsUseCase } from "@domain/application/payment/get-saved-cards.use-case";
 import { VerifyPaymentPort } from "@ports/in/payment/verify-payment.port";
 import { VerifyPaymentUseCase } from "@domain/application/payment/verify-payment.use-case";
+import { DeleteSavedCardPort } from "@ports/in/payment/delete-saved-card.port";
+import { DeleteSavedCardUseCase } from "@domain/application/payment/delete-saved-card.use-case";
 
 container.register<PaystackPaymentPort>("PaystackPaymentPort", {
     useClass: PaystackPaymentService
@@ -47,4 +49,8 @@ container.register<GetSavedCardsPort>("GetSavedCardsPort", {
 
 container.register<VerifyPaymentPort>("VerifyPaymentPort", {
     useClass: VerifyPaymentUseCase
+});
+
+container.register<DeleteSavedCardPort>("DeleteSavedCardPort", {
+    useClass: DeleteSavedCardUseCase
 });

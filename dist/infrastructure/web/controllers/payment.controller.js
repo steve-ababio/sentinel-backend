@@ -20,7 +20,7 @@ const paystack_signature_1 = require("../util/paystack-signature");
 const status_codes_1 = require("@common/web/status-codes");
 const logger = (0, logger_1.createLogger)('CONTROLLER', 'PAYMENT');
 let PaymentController = class PaymentController {
-    constructor(paystackCallbackPort, paystackWebhookPort, saveUserCardPort, chargeCardPort, chargeMobileMoneyPort, getSavedCardsPort, findAllTransactionsByUserPort, verifyPaymentPort) {
+    constructor(paystackCallbackPort, paystackWebhookPort, saveUserCardPort, chargeCardPort, chargeMobileMoneyPort, getSavedCardsPort, findAllTransactionsByUserPort, verifyPaymentPort, deleteSavedCardPort) {
         this.paystackCallbackPort = paystackCallbackPort;
         this.paystackWebhookPort = paystackWebhookPort;
         this.saveUserCardPort = saveUserCardPort;
@@ -29,6 +29,21 @@ let PaymentController = class PaymentController {
         this.getSavedCardsPort = getSavedCardsPort;
         this.findAllTransactionsByUserPort = findAllTransactionsByUserPort;
         this.verifyPaymentPort = verifyPaymentPort;
+        this.deleteSavedCardPort = deleteSavedCardPort;
+    }
+    async deleteSavedCard(ctx) {
+        const userId = ctx.state.jwtPayload.id;
+        const { id } = ctx.params;
+        try {
+            await this.deleteSavedCardPort.deleteSavedCard(id, userId);
+            ctx.status = status_codes_1.STATUS_CODES.OK;
+            ctx.body = { message: 'Saved card deleted successfully' };
+        }
+        catch (error) {
+            logger.error('Error in deleteSavedCard controller:', error);
+            ctx.status = status_codes_1.STATUS_CODES.INTERNAL_SERVER_ERROR;
+            ctx.body = { message: error.message || constants_1.MESSAGES.GENERIC_ERROR_HANDLER };
+        }
     }
     async getPaymentHistory(ctx) {
         const userId = ctx.state.jwtPayload.id;
@@ -179,5 +194,6 @@ exports.PaymentController = PaymentController = __decorate([
     __param(5, (0, tsyringe_1.inject)("GetSavedCardsPort")),
     __param(6, (0, tsyringe_1.inject)("FindAllTransactionsByUserPort")),
     __param(7, (0, tsyringe_1.inject)("VerifyPaymentPort")),
-    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, Object, Object])
+    __param(8, (0, tsyringe_1.inject)("DeleteSavedCardPort")),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, Object, Object, Object])
 ], PaymentController);

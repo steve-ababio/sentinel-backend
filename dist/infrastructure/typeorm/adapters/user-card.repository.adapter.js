@@ -47,6 +47,14 @@ let UserCardRepositoryAdapter = class UserCardRepositoryAdapter {
         });
         return entities.map(e => this.toDomain(e));
     }
+    async delete(id, userId) {
+        const card = await this.repository.findOne({
+            where: { id, user: { id: userId } }
+        });
+        if (card) {
+            await this.repository.remove(card);
+        }
+    }
 };
 exports.UserCardRepositoryAdapter = UserCardRepositoryAdapter;
 exports.UserCardRepositoryAdapter = UserCardRepositoryAdapter = __decorate([

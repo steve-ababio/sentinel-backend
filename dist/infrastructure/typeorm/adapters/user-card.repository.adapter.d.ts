@@ -7,4 +7,5 @@ export declare class UserCardRepositoryAdapter implements UserCardPersistencePor
     private toEntity;
     save(userCard: UserCardEntity): Promise<UserCardEntity>;
     findByUserId(userId: string): Promise<UserCardEntity[]>;
+    delete(id: string, userId: string): Promise<void>;
 }

@@ -6,6 +6,7 @@ import { ChargeMobileMoneyPort } from "@ports/in/payment/charge-mobile-money.por
 import { GetSavedCardsPort } from "@ports/in/payment/get-saved-cards.port";
 import { FindAllTransactionsByUserPort } from "@ports/in/transaction/find-all-transactions-by-user.port";
 import { VerifyPaymentPort } from "@ports/in/payment/verify-payment.port";
+import { DeleteSavedCardPort } from "@ports/in/payment/delete-saved-card.port";
 export declare class PaymentController {
     private paystackCallbackPort;
     private paystackWebhookPort;
@@ -15,7 +16,9 @@ export declare class PaymentController {
     private getSavedCardsPort;
     private findAllTransactionsByUserPort;
     private verifyPaymentPort;
-    constructor(paystackCallbackPort: PaystackCallbackPort, paystackWebhookPort: PaystackWebhookPort, saveUserCardPort: SaveUserCardPort, chargeCardPort: ChargeCardPort, chargeMobileMoneyPort: ChargeMobileMoneyPort, getSavedCardsPort: GetSavedCardsPort, findAllTransactionsByUserPort: FindAllTransactionsByUserPort, verifyPaymentPort: VerifyPaymentPort);
+    private deleteSavedCardPort;
+    constructor(paystackCallbackPort: PaystackCallbackPort, paystackWebhookPort: PaystackWebhookPort, saveUserCardPort: SaveUserCardPort, chargeCardPort: ChargeCardPort, chargeMobileMoneyPort: ChargeMobileMoneyPort, getSavedCardsPort: GetSavedCardsPort, findAllTransactionsByUserPort: FindAllTransactionsByUserPort, verifyPaymentPort: VerifyPaymentPort, deleteSavedCardPort: DeleteSavedCardPort);
+    deleteSavedCard(ctx: any): Promise<void>;
     getPaymentHistory(ctx: any): Promise<void>;
     getSavedCards(ctx: any): Promise<void>;
     chargeCard(ctx: any): Promise<void>;
