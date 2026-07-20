@@ -16,7 +16,7 @@ const logger = createLogger('ROOT', 'KOA');
 import * as Sentry from '@sentry/node';
 
 const app: Koa = new Koa();
-
+app.proxy = true;
 app.keys = [process.env.SESSION_SECRET || 'super-secret-key'];
 app.use(session({}, app))
 app.use(userAgent);

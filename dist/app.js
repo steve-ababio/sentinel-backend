@@ -53,6 +53,7 @@ const logger = (0, logger_1.createLogger)('ROOT', 'KOA');
 const Sentry = __importStar(require("@sentry/node"));
 const app = new koa_1.default();
 exports.app = app;
+app.proxy = true;
 app.keys = [process.env.SESSION_SECRET || 'super-secret-key'];
 app.use((0, koa_session_1.default)({}, app));
 app.use(koa_useragent_1.default);
