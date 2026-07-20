@@ -49,13 +49,15 @@ let AuthController = class AuthController {
             const tokens = (0, jwt_1.generateTokenPair)(user.id, sessionId);
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 30
+                maxAge: 1000 * 60 * 15
             });
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 20
+                maxAge: 1000 * 60 * 60 * 24 * 30
             });
             ctx.status = status_codes_1.STATUS_CODES.CREATED;
             ctx.body = {
@@ -85,13 +87,15 @@ let AuthController = class AuthController {
             const tokens = (0, jwt_1.generateTokenPair)(user.id, sessionId);
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 15
             });
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 7
+                maxAge: 1000 * 60 * 60 * 24 * 30
             });
             ctx.status = status_codes_1.STATUS_CODES.OK;
             ctx.body = {
@@ -132,13 +136,15 @@ let AuthController = class AuthController {
             const { message, accessToken, refreshToken } = await this.googleAuthPort.authenticate(idToken, userAgent);
             ctx.cookies.set("accessToken", accessToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 15
             });
             ctx.cookies.set("refreshToken", refreshToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 7
+                maxAge: 1000 * 60 * 60 * 24 * 30
             });
             ctx.status = status_codes_1.STATUS_CODES.OK;
             ctx.body = { message, accessToken, refreshToken };
@@ -195,11 +201,13 @@ let AuthController = class AuthController {
             ctx.status = status_codes_1.STATUS_CODES.OK;
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 15
             });
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 60 * 24 * 30
             });

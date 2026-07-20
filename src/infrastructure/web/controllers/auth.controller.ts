@@ -15,7 +15,6 @@ import { LogoutPort } from "@ports/in/auth/logout.port";
 import { SendOtpPort } from "@ports/in/auth/send-otp.port";
 import { ValidateOtpPort } from "@ports/in/auth/validate-otp.port";
 import { handleRouteError } from "@common/global/utils";
-import { OtpValidationType } from "@common/user/enum";
 import { RouteError } from "../util/route-error";
 
 
@@ -60,16 +59,16 @@ export class AuthController {
             const tokens = generateTokenPair(user.id as string, sessionId);
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
-                // secure: true,          // true in production (HTTPS)
+                secure: true,          // true in production (HTTPS)
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 30 // 15 minutes
+                maxAge: 1000 * 60 * 15 // 15 minutes
             });
 
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
-                // secure: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 20 // 7 days
+                maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
             ctx.status = STATUS_CODES.CREATED;
             ctx.body = { 
@@ -100,16 +99,16 @@ export class AuthController {
 
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
-                // secure: true,          // true in production (HTTPS)
+                secure: true,          // true in production (HTTPS)
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 15 // 15 minutes
             });
     
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
-                // secure: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+                maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
     
             ctx.status = STATUS_CODES.OK;
@@ -155,14 +154,16 @@ export class AuthController {
             
             ctx.cookies.set("accessToken", accessToken, {
                 httpOnly: true,
+                secure: true,
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 15 // 15 minutes
             });
 
             ctx.cookies.set("refreshToken", refreshToken, {
                 httpOnly: true,
+                secure:true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+                maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
 
             ctx.status = STATUS_CODES.OK;
@@ -224,16 +225,16 @@ export class AuthController {
 
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
-                // secure: true,          // true in production (HTTPS)
+                secure: true,          // true in production (HTTPS)
                 sameSite: "lax",
                 maxAge: 1000 * 60 * 15 // 15 minutes
             });
     
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
-                // secure: true,
+                secure: true,
                 sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 30 // 7 days
+                maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
     
             ctx.body = {
@@ -247,8 +248,6 @@ export class AuthController {
 
     async logout(ctx: any) {
         let sessionId = ctx.request.body?.sessionId;
-        
-        // Extract sessionId from access token if not in body
         if (!sessionId) {
             const accessToken = ctx.cookies.get("accessToken");
             if (accessToken) {
@@ -261,7 +260,6 @@ export class AuthController {
             }
         }
         
-        // Extract sessionId from refresh token if still not found
         if (!sessionId) {
             const refreshToken = ctx.cookies.get("refreshToken");
             if (refreshToken) {
