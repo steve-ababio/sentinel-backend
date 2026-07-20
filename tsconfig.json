@@ -15,10 +15,10 @@
         "rootDir": "./src",
         "resolveJsonModule": true,
         "paths": {
-            "@infrastructure/*": ["src/infrastructure/*"],
-            "@domain/*": ["src/domain/*"],
-            "@ports/*": ["src/ports/*"],
-            "@common/*": ["src/common/*"]
+            "@infrastructure/*": ["src/infrastructure/*", "dist/infrastructure/*"],
+            "@domain/*": ["src/domain/*", "dist/domain/*"],
+            "@ports/*": ["src/ports/*", "dist/ports/*"],
+            "@common/*": ["src/common/*", "dist/common/*"]
           }
     },
     "include": [
