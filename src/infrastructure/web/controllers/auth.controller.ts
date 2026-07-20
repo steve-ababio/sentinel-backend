@@ -60,15 +60,17 @@ export class AuthController {
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: true,          // true in production (HTTPS)
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 15 // 15 minutes
+                sameSite: "none",
+                maxAge: 1000 * 60 * 15, // 15 minutes
+                path: "/",
             });
 
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
+                sameSite: "none",
+                maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
+                path: "/",
             });
             ctx.status = STATUS_CODES.CREATED;
             ctx.body = { 
@@ -100,14 +102,16 @@ export class AuthController {
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: true,          // true in production (HTTPS)
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 15 // 15 minutes
+                sameSite: "none",
+                maxAge: 1000 * 60 * 15, // 15 minutes
+                path: "/",
             });
     
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
     
@@ -155,14 +159,16 @@ export class AuthController {
             ctx.cookies.set("accessToken", accessToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 15 // 15 minutes
             });
 
             ctx.cookies.set("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure:true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
 
@@ -226,14 +232,16 @@ export class AuthController {
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: true,          // true in production (HTTPS)
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 15 // 15 minutes
             });
     
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 60 * 24 * 30 // 30 days
             });
     
@@ -281,16 +289,17 @@ export class AuthController {
             // Clear HTTP-only cookies from client
             ctx.cookies.set("accessToken", "", {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: "none",
                 expires: new Date(0),
                 maxAge: 0
             });
             
             ctx.cookies.set("refreshToken", "", {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: "none",
                 expires: new Date(0),
-                maxAge: 0
+                maxAge: 0,
+                
             });
             
             ctx.status = STATUS_CODES.OK;

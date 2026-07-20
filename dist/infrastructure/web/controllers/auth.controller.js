@@ -50,14 +50,16 @@ let AuthController = class AuthController {
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 15
+                sameSite: "none",
+                maxAge: 1000 * 60 * 15,
+                path: "/",
             });
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 60 * 24 * 30
+                sameSite: "none",
+                maxAge: 1000 * 60 * 60 * 24 * 30,
+                path: "/",
             });
             ctx.status = status_codes_1.STATUS_CODES.CREATED;
             ctx.body = {
@@ -88,13 +90,15 @@ let AuthController = class AuthController {
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
-                maxAge: 1000 * 60 * 15
+                sameSite: "none",
+                maxAge: 1000 * 60 * 15,
+                path: "/",
             });
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 60 * 24 * 30
             });
             ctx.status = status_codes_1.STATUS_CODES.OK;
@@ -137,13 +141,15 @@ let AuthController = class AuthController {
             ctx.cookies.set("accessToken", accessToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 15
             });
             ctx.cookies.set("refreshToken", refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 60 * 24 * 30
             });
             ctx.status = status_codes_1.STATUS_CODES.OK;
@@ -202,13 +208,15 @@ let AuthController = class AuthController {
             ctx.cookies.set("accessToken", tokens.accessToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 15
             });
             ctx.cookies.set("refreshToken", tokens.refreshToken, {
                 httpOnly: true,
                 secure: true,
-                sameSite: "lax",
+                sameSite: "none",
+                path: "/",
                 maxAge: 1000 * 60 * 60 * 24 * 30
             });
             ctx.body = {
@@ -250,15 +258,15 @@ let AuthController = class AuthController {
             }
             ctx.cookies.set("accessToken", "", {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: "none",
                 expires: new Date(0),
                 maxAge: 0
             });
             ctx.cookies.set("refreshToken", "", {
                 httpOnly: true,
-                sameSite: "lax",
+                sameSite: "none",
                 expires: new Date(0),
-                maxAge: 0
+                maxAge: 0,
             });
             ctx.status = status_codes_1.STATUS_CODES.OK;
             ctx.body = { message: 'Logged out successfully' };
