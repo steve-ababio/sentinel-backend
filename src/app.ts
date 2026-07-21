@@ -45,9 +45,9 @@ app.use(async (ctx, next) => {
 });
 app.use(async (ctx, next) => {
     try {
-      if (!ctx.path.startsWith('/auth/register') && !ctx.path.startsWith('/auth/login')) {
-        logger.info('Request Body:', { body: ctx.request.body, path: ctx.path });
-      }
+      // if (!ctx.path.startsWith('/auth/register') && !ctx.path.startsWith('/auth/login')) {
+      //   logger.info('Request Body:', { body: ctx.request.body, path: ctx.path });
+      // }
       await next();
     } catch (error: any) {
       const isClientAbort = (err: any) => {
