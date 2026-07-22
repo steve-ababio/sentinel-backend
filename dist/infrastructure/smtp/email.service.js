@@ -14,9 +14,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.EmailService = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const node_dns_1 = __importDefault(require("node:dns"));
 const tsyringe_1 = require("tsyringe");
 let EmailService = class EmailService {
     constructor() {
+        node_dns_1.default.setDefaultResultOrder("ipv4first");
         this.transporter = nodemailer_1.default.createTransport({
             host: process.env.EMAIL_HOST,
             port: Number(process.env.MAIL_PORT),

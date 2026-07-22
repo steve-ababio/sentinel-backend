@@ -1,5 +1,6 @@
 import nodemailer, { SentMessageInfo } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
+import dns from "node:dns";
 import { injectable } from 'tsyringe';
 
 
@@ -12,6 +13,8 @@ export class EmailService implements IEmailService {
     private transporter: nodemailer.Transporter<SentMessageInfo>;
 
     constructor() {
+      
+        dns.setDefaultResultOrder("ipv4first");
         this.transporter = nodemailer.createTransport({
             host: process.env.EMAIL_HOST,
             port: Number(process.env.MAIL_PORT),
