@@ -3,7 +3,8 @@ export interface IEmailService {
     sendEmail(email: string, subject: string, html: string, imageattachments: Mail.Attachment[]): Promise<void>;
 }
 export declare class EmailService implements IEmailService {
-    private transporter;
+    private transporterPromise;
     constructor();
+    private initTransporter;
     sendEmail(email: string, subject: string, html: string, imageattachments: Mail.Attachment[]): Promise<void>;
 }
