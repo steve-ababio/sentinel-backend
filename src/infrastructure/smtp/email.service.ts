@@ -20,23 +20,35 @@ export class EmailService implements IEmailService {
     }
 
     private async initTransporter(): Promise<nodemailer.Transporter<SentMessageInfo>> {
+        const host = process.env.MAIL_HOST || '';
+        let resolvedHost = host;
+        try {
+            if (host) {
+                // Force DNS lookup to prefer IPv4 over IPv6 to avoid ENETUNREACH in environments without outbound IPv6 (like Render)
+                const lookupResult = await dns.promises.lookup(host, { family: 4 });
+                resolvedHost = lookupResult.address;
+            }
+        } catch (error) {
+            console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
+        }
 
         const transporterPromise =  nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
+            host: resolvedHost,
             port: Number(process.env.MAIL_PORT),
-            secure: true,
+            secure: false,
+            requireTLS: true,
             auth: {
                 user: process.env.MAIL_USER,
                 pass: process.env.MAIL_PASS,
             },
+            tls: {
+                servername: host,
+            }
         } as nodemailer.TransportOptions);
-        logger.info("host:",process.env.MAIL_HOST);
-        logger.info("port:",process.env.MAIL_PORT);
-        logger.info("user:",process.env.MAIL_USER);
-        logger.info("pass:",process.env.MAIL_PASS);
-        const transporter = await this.transporterPromise;
-        await transporter.verify();
-        logger.info("SMTP connected");
+        console.log("host:",process.env.MAIL_HOST);
+        console.log("port:",process.env.MAIL_PORT);
+        console.log("user:",process.env.MAIL_USER);
+        console.log("pass:",process.env.MAIL_PASS);
         return transporterPromise;
         
     }

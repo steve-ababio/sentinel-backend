@@ -16,29 +16,40 @@ exports.EmailService = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const node_dns_1 = __importDefault(require("node:dns"));
 const tsyringe_1 = require("tsyringe");
-const logger_1 = require("@infrastructure/web/util/logger");
 let EmailService = class EmailService {
     constructor() {
         node_dns_1.default.setDefaultResultOrder("ipv4first");
         this.transporterPromise = this.initTransporter();
     }
     async initTransporter() {
+        const host = process.env.MAIL_HOST || '';
+        let resolvedHost = host;
+        try {
+            if (host) {
+                const lookupResult = await node_dns_1.default.promises.lookup(host, { family: 4 });
+                resolvedHost = lookupResult.address;
+            }
+        }
+        catch (error) {
+            console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
+        }
         const transporterPromise = nodemailer_1.default.createTransport({
-            host: process.env.MAIL_HOST,
+            host: resolvedHost,
             port: Number(process.env.MAIL_PORT),
-            secure: true,
+            secure: false,
+            requireTLS: true,
             auth: {
                 user: process.env.MAIL_USER,
                 pass: process.env.MAIL_PASS,
             },
+            tls: {
+                servername: host,
+            }
         });
-        logger_1.logger.info("host:", process.env.MAIL_HOST);
-        logger_1.logger.info("port:", process.env.MAIL_PORT);
-        logger_1.logger.info("user:", process.env.MAIL_USER);
-        logger_1.logger.info("pass:", process.env.MAIL_PASS);
-        const transporter = await this.transporterPromise;
-        await transporter.verify();
-        logger_1.logger.info("SMTP connected");
+        console.log("host:", process.env.MAIL_HOST);
+        console.log("port:", process.env.MAIL_PORT);
+        console.log("user:", process.env.MAIL_USER);
+        console.log("pass:", process.env.MAIL_PASS);
         return transporterPromise;
     }
     async sendEmail(email, subject, html, imageattachments) {
