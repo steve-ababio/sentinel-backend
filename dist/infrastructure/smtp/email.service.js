@@ -23,34 +23,19 @@ let EmailService = class EmailService {
         this.transporterPromise = this.initTransporter();
     }
     async initTransporter() {
-        const host = process.env.EMAIL_HOST || '';
-        let resolvedHost = host;
-        try {
-            if (host) {
-                const lookupResult = await node_dns_1.default.promises.lookup(host, { family: 4 });
-                resolvedHost = lookupResult.address;
-            }
-        }
-        catch (error) {
-            console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
-        }
         const transporterPromise = nodemailer_1.default.createTransport({
-            host: resolvedHost,
+            host: process.env.MAIL_HOST,
             port: Number(process.env.MAIL_PORT),
-            secure: false,
-            requireTLS: true,
+            secure: true,
             auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS,
             },
-            tls: {
-                servername: host,
-            }
         });
-        logger_1.logger.info("host:", process.env.EMAIL_HOST);
-        logger_1.logger.info("port:", process.env.EMAIL_PORT);
-        logger_1.logger.info("user:", process.env.EMAIL_USER);
-        logger_1.logger.info("pass:", process.env.EMAIL_PASS);
+        logger_1.logger.info("host:", process.env.MAIL_HOST);
+        logger_1.logger.info("port:", process.env.MAIL_PORT);
+        logger_1.logger.info("user:", process.env.MAIL_USER);
+        logger_1.logger.info("pass:", process.env.MAIL_PASS);
         const transporter = await this.transporterPromise;
         await transporter.verify();
         logger_1.logger.info("SMTP connected");
