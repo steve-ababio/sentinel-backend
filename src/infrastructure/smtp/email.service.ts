@@ -2,6 +2,7 @@ import nodemailer, { SentMessageInfo } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import dns from "node:dns";
 import { injectable } from 'tsyringe';
+import { logger } from '@infrastructure/web/util/logger';
 
 
 export interface IEmailService {
@@ -15,6 +16,7 @@ export class EmailService implements IEmailService {
     constructor() {
         dns.setDefaultResultOrder("ipv4first");
         this.transporterPromise = this.initTransporter();
+
     }
 
     private async initTransporter(): Promise<nodemailer.Transporter<SentMessageInfo>> {
@@ -30,7 +32,7 @@ export class EmailService implements IEmailService {
             console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
         }
 
-        return nodemailer.createTransport({
+        const transporterPromise =  nodemailer.createTransport({
             host: resolvedHost,
             port: Number(process.env.MAIL_PORT),
             secure: false,
@@ -43,6 +45,15 @@ export class EmailService implements IEmailService {
                 servername: host,
             }
         } as nodemailer.TransportOptions);
+        logger.info("host:",process.env.EMAIL_HOST);
+        logger.info("port:",process.env.EMAIL_PORT);
+        logger.info("user:",process.env.EMAIL_USER);
+        logger.info("pass:",process.env.EMAIL_PASS);
+        const transporter = await this.transporterPromise;
+        await transporter.verify();
+        logger.info("SMTP connected");
+        return transporterPromise;
+        
     }
 
     async sendEmail(email: string, subject: string, html: string,imageattachments:Mail.Attachment[],): Promise<void> {

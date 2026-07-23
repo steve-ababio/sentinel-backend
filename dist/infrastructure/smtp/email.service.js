@@ -16,6 +16,7 @@ exports.EmailService = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const node_dns_1 = __importDefault(require("node:dns"));
 const tsyringe_1 = require("tsyringe");
+const logger_1 = require("@infrastructure/web/util/logger");
 let EmailService = class EmailService {
     constructor() {
         node_dns_1.default.setDefaultResultOrder("ipv4first");
@@ -33,7 +34,7 @@ let EmailService = class EmailService {
         catch (error) {
             console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
         }
-        return nodemailer_1.default.createTransport({
+        const transporterPromise = nodemailer_1.default.createTransport({
             host: resolvedHost,
             port: Number(process.env.MAIL_PORT),
             secure: false,
@@ -46,6 +47,14 @@ let EmailService = class EmailService {
                 servername: host,
             }
         });
+        logger_1.logger.info("host:", process.env.EMAIL_HOST);
+        logger_1.logger.info("port:", process.env.EMAIL_PORT);
+        logger_1.logger.info("user:", process.env.EMAIL_USER);
+        logger_1.logger.info("pass:", process.env.EMAIL_PASS);
+        const transporter = await this.transporterPromise;
+        await transporter.verify();
+        logger_1.logger.info("SMTP connected");
+        return transporterPromise;
     }
     async sendEmail(email, subject, html, imageattachments) {
         const transporter = await this.transporterPromise;
