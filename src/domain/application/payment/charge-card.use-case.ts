@@ -4,6 +4,8 @@ import { PaystackPaymentPort } from "@ports/out/payment/paystack.payment";
 import { UserCardPersistencePort } from "@ports/out/persistence/user-card.persistence";
 import { UserCardEntity } from "@domain/models/entities/user-card.entity";
 import { logger } from "@infrastructure/web/util/logger";
+import { UserPersistencePort } from "@ports/out/persistence/user.persistence";
+import { RouteError } from "@infrastructure/error/route-error";
 
 @autoInjectable()
 export class ChargeCardUseCase implements ChargeCardPort {
@@ -11,20 +13,26 @@ export class ChargeCardUseCase implements ChargeCardPort {
         @inject("PaystackPaymentPort")
         private paystackPaymentPort: PaystackPaymentPort,
         @inject("UserCardPersistencePort")
-        private userCardPersistencePort: UserCardPersistencePort
+        private userCardPersistencePort: UserCardPersistencePort,
+        @inject("UserPersistencePort")
+        private userPersistencePort: UserPersistencePort
     ) {}
 
-    async chargeCard(userId: string, email: string, cardDetails: any, amount: number, courseId: string): Promise<any> {
+    async chargeCard(userId: string, cardDetails: any, amount: number, courseId: string): Promise<any> {
         try {
+            const user = await this.userPersistencePort.findById(userId);
+            if(!user){
+                throw new RouteError(404,"User not found");
+            }
             const metadata = { userId, courseId };
             let response;
             
             if (cardDetails.authorization_code) {
                 // Charge using a saved card token
-                response = await this.paystackPaymentPort.chargeAuthorization(cardDetails.authorization_code, email, amount, metadata);
+                response = await this.paystackPaymentPort.chargeAuthorization(cardDetails.authorization_code, user.email, amount, metadata);
             } else {
                 // Charge using raw card details
-                response = await this.paystackPaymentPort.chargeCard(cardDetails, email, amount, metadata);
+                response = await this.paystackPaymentPort.chargeCard(cardDetails, user.email, amount, metadata);
             }
             
             // If the charge succeeds immediately, save the card (only if it's a new card)

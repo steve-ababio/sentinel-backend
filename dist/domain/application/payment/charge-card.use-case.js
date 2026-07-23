@@ -16,20 +16,26 @@ exports.ChargeCardUseCase = void 0;
 const tsyringe_1 = require("tsyringe");
 const user_card_entity_1 = require("@domain/models/entities/user-card.entity");
 const logger_1 = require("@infrastructure/web/util/logger");
+const route_error_1 = require("@infrastructure/error/route-error");
 let ChargeCardUseCase = class ChargeCardUseCase {
-    constructor(paystackPaymentPort, userCardPersistencePort) {
+    constructor(paystackPaymentPort, userCardPersistencePort, userPersistencePort) {
         this.paystackPaymentPort = paystackPaymentPort;
         this.userCardPersistencePort = userCardPersistencePort;
+        this.userPersistencePort = userPersistencePort;
     }
-    async chargeCard(userId, email, cardDetails, amount, courseId) {
+    async chargeCard(userId, cardDetails, amount, courseId) {
         try {
+            const user = await this.userPersistencePort.findById(userId);
+            if (!user) {
+                throw new route_error_1.RouteError(404, "User not found");
+            }
             const metadata = { userId, courseId };
             let response;
             if (cardDetails.authorization_code) {
-                response = await this.paystackPaymentPort.chargeAuthorization(cardDetails.authorization_code, email, amount, metadata);
+                response = await this.paystackPaymentPort.chargeAuthorization(cardDetails.authorization_code, user.email, amount, metadata);
             }
             else {
-                response = await this.paystackPaymentPort.chargeCard(cardDetails, email, amount, metadata);
+                response = await this.paystackPaymentPort.chargeCard(cardDetails, user.email, amount, metadata);
             }
             if (!cardDetails.authorization_code && response.status === true && response.data?.status === 'success') {
                 const authorization = response.data.authorization;
@@ -51,5 +57,6 @@ exports.ChargeCardUseCase = ChargeCardUseCase = __decorate([
     (0, tsyringe_1.autoInjectable)(),
     __param(0, (0, tsyringe_1.inject)("PaystackPaymentPort")),
     __param(1, (0, tsyringe_1.inject)("UserCardPersistencePort")),
-    __metadata("design:paramtypes", [Object, Object])
+    __param(2, (0, tsyringe_1.inject)("UserPersistencePort")),
+    __metadata("design:paramtypes", [Object, Object, Object])
 ], ChargeCardUseCase);

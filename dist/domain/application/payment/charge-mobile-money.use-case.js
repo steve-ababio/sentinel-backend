@@ -15,14 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChargeMobileMoneyUseCase = void 0;
 const tsyringe_1 = require("tsyringe");
 const logger_1 = require("@infrastructure/web/util/logger");
+const route_error_1 = require("@infrastructure/error/route-error");
 let ChargeMobileMoneyUseCase = class ChargeMobileMoneyUseCase {
-    constructor(paystackPaymentPort) {
+    constructor(paystackPaymentPort, userPersistencePort) {
         this.paystackPaymentPort = paystackPaymentPort;
+        this.userPersistencePort = userPersistencePort;
     }
-    async chargeMobileMoney(userId, email, mobileMoney, amount, courseId) {
+    async chargeMobileMoney(userId, mobileMoney, amount, courseId) {
         try {
+            const user = await this.userPersistencePort.findById(userId);
+            if (!user) {
+                throw new route_error_1.RouteError(404, "User not found");
+            }
             const metadata = { userId, courseId };
-            const response = await this.paystackPaymentPort.chargeMobileMoney(mobileMoney, email, amount, metadata);
+            const response = await this.paystackPaymentPort.chargeMobileMoney(mobileMoney, user.email, amount, metadata);
             return response;
         }
         catch (error) {
@@ -35,5 +41,6 @@ exports.ChargeMobileMoneyUseCase = ChargeMobileMoneyUseCase;
 exports.ChargeMobileMoneyUseCase = ChargeMobileMoneyUseCase = __decorate([
     (0, tsyringe_1.autoInjectable)(),
     __param(0, (0, tsyringe_1.inject)("PaystackPaymentPort")),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, tsyringe_1.inject)("UserPersistencePort")),
+    __metadata("design:paramtypes", [Object, Object])
 ], ChargeMobileMoneyUseCase);

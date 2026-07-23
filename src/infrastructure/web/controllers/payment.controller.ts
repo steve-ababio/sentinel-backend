@@ -73,9 +73,8 @@ export class PaymentController {
     }
 
     async chargeCard(ctx: any) {
-        const { cardDetails, amount, email, courseId } = ctx.request.body;
+        const { cardDetails, amount, courseId } = ctx.request.body;
         const userId = ctx.state.jwtPayload.id;
-        const customerEmail = email;
 
         if (!cardDetails || !amount || !courseId) {
             ctx.status = STATUS_CODES.BAD_REQUEST;
@@ -84,7 +83,7 @@ export class PaymentController {
         }
 
         try {
-            const response = await this.chargeCardPort.chargeCard(userId, customerEmail, cardDetails, amount, courseId);
+            const response = await this.chargeCardPort.chargeCard(userId, cardDetails, amount, courseId);
             ctx.status = STATUS_CODES.OK;
             ctx.body = { message: 'Charge processed', data: response };
         } catch (error: any) {
@@ -95,9 +94,8 @@ export class PaymentController {
     }
 
     async chargeMobileMoney(ctx: any) {
-        const { mobileMoney, amount, email, courseId } = ctx.request.body;
+        const { mobileMoney, amount, courseId } = ctx.request.body;
         const userId = ctx.state.jwtPayload.id;
-        const customerEmail = email;
 
         if (!mobileMoney || !amount || !courseId) {
             ctx.status = STATUS_CODES.BAD_REQUEST;
@@ -106,7 +104,7 @@ export class PaymentController {
         }
 
         try {
-            const response = await this.chargeMobileMoneyPort.chargeMobileMoney(userId, customerEmail, mobileMoney, amount, courseId);
+            const response = await this.chargeMobileMoneyPort.chargeMobileMoney(userId, mobileMoney, amount, courseId);
             ctx.status = STATUS_CODES.OK;
             ctx.body = { message: 'Mobile money charge processed', data: response };
         } catch (error: any) {

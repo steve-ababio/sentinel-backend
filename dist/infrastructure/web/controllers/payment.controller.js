@@ -72,16 +72,15 @@ let PaymentController = class PaymentController {
         }
     }
     async chargeCard(ctx) {
-        const { cardDetails, amount, email, courseId } = ctx.request.body;
+        const { cardDetails, amount, courseId } = ctx.request.body;
         const userId = ctx.state.jwtPayload.id;
-        const customerEmail = email;
         if (!cardDetails || !amount || !courseId) {
             ctx.status = status_codes_1.STATUS_CODES.BAD_REQUEST;
             ctx.body = { message: 'Card details, amount, and courseId are required' };
             return;
         }
         try {
-            const response = await this.chargeCardPort.chargeCard(userId, customerEmail, cardDetails, amount, courseId);
+            const response = await this.chargeCardPort.chargeCard(userId, cardDetails, amount, courseId);
             ctx.status = status_codes_1.STATUS_CODES.OK;
             ctx.body = { message: 'Charge processed', data: response };
         }
@@ -92,16 +91,15 @@ let PaymentController = class PaymentController {
         }
     }
     async chargeMobileMoney(ctx) {
-        const { mobileMoney, amount, email, courseId } = ctx.request.body;
+        const { mobileMoney, amount, courseId } = ctx.request.body;
         const userId = ctx.state.jwtPayload.id;
-        const customerEmail = email;
         if (!mobileMoney || !amount || !courseId) {
             ctx.status = status_codes_1.STATUS_CODES.BAD_REQUEST;
             ctx.body = { message: 'Mobile money details, amount, and courseId are required' };
             return;
         }
         try {
-            const response = await this.chargeMobileMoneyPort.chargeMobileMoney(userId, customerEmail, mobileMoney, amount, courseId);
+            const response = await this.chargeMobileMoneyPort.chargeMobileMoney(userId, mobileMoney, amount, courseId);
             ctx.status = status_codes_1.STATUS_CODES.OK;
             ctx.body = { message: 'Mobile money charge processed', data: response };
         }
