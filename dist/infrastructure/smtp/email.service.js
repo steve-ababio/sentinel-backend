@@ -19,8 +19,22 @@ const tsyringe_1 = require("tsyringe");
 let EmailService = class EmailService {
     constructor() {
         node_dns_1.default.setDefaultResultOrder("ipv4first");
-        this.transporter = nodemailer_1.default.createTransport({
-            host: process.env.EMAIL_HOST,
+        this.transporterPromise = this.initTransporter();
+    }
+    async initTransporter() {
+        const host = process.env.EMAIL_HOST || '';
+        let resolvedHost = host;
+        try {
+            if (host) {
+                const lookupResult = await node_dns_1.default.promises.lookup(host, { family: 4 });
+                resolvedHost = lookupResult.address;
+            }
+        }
+        catch (error) {
+            console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
+        }
+        return nodemailer_1.default.createTransport({
+            host: resolvedHost,
             port: Number(process.env.MAIL_PORT),
             secure: false,
             requireTLS: true,
@@ -28,13 +42,14 @@ let EmailService = class EmailService {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            connectionTimeout: 60000,
-            greetingTimeout: 60000,
-            socketTimeout: 60000,
+            tls: {
+                servername: host,
+            }
         });
     }
     async sendEmail(email, subject, html, imageattachments) {
-        const messageStatus = await this.transporter.sendMail({
+        const transporter = await this.transporterPromise;
+        const messageStatus = await transporter.sendMail({
             from: 'noreply <sentinel240391@gmail.com>',
             to: email,
             subject,

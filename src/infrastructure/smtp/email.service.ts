@@ -10,27 +10,44 @@ export interface IEmailService {
 
 @injectable()
 export class EmailService implements IEmailService {
-    private transporter: nodemailer.Transporter<SentMessageInfo>;
+    private transporterPromise: Promise<nodemailer.Transporter<SentMessageInfo>>;
 
     constructor() {
         dns.setDefaultResultOrder("ipv4first");
-        this.transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
+        this.transporterPromise = this.initTransporter();
+    }
+
+    private async initTransporter(): Promise<nodemailer.Transporter<SentMessageInfo>> {
+        const host = process.env.EMAIL_HOST || '';
+        let resolvedHost = host;
+        try {
+            if (host) {
+                // Force DNS lookup to prefer IPv4 over IPv6 to avoid ENETUNREACH in environments without outbound IPv6 (like Render)
+                const lookupResult = await dns.promises.lookup(host, { family: 4 });
+                resolvedHost = lookupResult.address;
+            }
+        } catch (error) {
+            console.error(`DNS lookup failed for SMTP host ${host}, falling back to hostname:`, error);
+        }
+
+        return nodemailer.createTransport({
+            host: resolvedHost,
             port: Number(process.env.MAIL_PORT),
             secure: false,
             requireTLS: true,
-            auth: { 
+            auth: {
                 user: process.env.EMAIL_USER,
                 pass: process.env.EMAIL_PASS,
             },
-            connectionTimeout: 60000,
-            greetingTimeout: 60000,
-            socketTimeout: 60000,
+            tls: {
+                servername: host,
+            }
         } as nodemailer.TransportOptions);
     }
 
     async sendEmail(email: string, subject: string, html: string,imageattachments:Mail.Attachment[],): Promise<void> {
-        const messageStatus = await this.transporter.sendMail({
+        const transporter = await this.transporterPromise;
+        const messageStatus = await transporter.sendMail({
             from: 'noreply <sentinel240391@gmail.com>',
             to: email, 
             subject,
